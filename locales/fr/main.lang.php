@@ -1,8 +1,9 @@
 <?php
-// Language: Français 
+
+// Language: Français
 // Module: templator - 1.3.3
-// Date: 2012-10-02 12:59:08 
-// Translated with dcTranslater - 1.5 
+// Date: 2012-10-02 12:59:08
+// Translated with dcTranslater - 1.5
 
 #_admin.php:15
 $GLOBALS['__l10n']['Templates'] = 'Templates';
@@ -146,5 +147,3 @@ $GLOBALS['__l10n']['Back to templates list'] = 'Retour à la liste des templates
 
 #template_posts.php:128
 $GLOBALS['__l10n']['Unselect the template'] = 'Désélectionner le template';
-
-?>

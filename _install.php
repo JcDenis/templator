@@ -1,32 +1,35 @@
 <?php
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of templator a plugin for Dotclear 2.
-# 
-# Copyright (c) 2010 Osku and contributors
-# Licensed under the GPL version 2.0 license.
-# A copy of this license is available in LICENSE file or at
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
 
-if (!defined('DC_CONTEXT_ADMIN')) { exit; }
-
-if (version_compare(DC_VERSION,'2.3.1','<'))
-{
-	$core->error->add(__('Version 2.3.1 of Dotclear at least is required for this version of Templator.'));
-	$core->plugins->deactivateModule('templator');
-	return false;
+if (!defined('DC_CONTEXT_ADMIN')) {
+    return null;
 }
 
-$new_version = $core->plugins->moduleInfo('templator','version');
- 
-$current_version = $core->getVersion('templator');
- 
-if (version_compare($current_version,$new_version,'>=')) {
-	return;
+try {
+    # Grab info
+    $mod_id      = basename(__DIR__);
+    $dc_min      = dcCore::app()->plugins->moduleInfo($mod_id, 'requires')[0][1];
+    $new_version = dcCore::app()->plugins->moduleInfo($mod_id, 'version');
+
+    if (version_compare(dcCore::app()->getVersion($mod_id), $new_version, '>=')) {
+        return null;
+    }
+
+    # Check Dotclear version
+    if (!method_exists('dcUtils', 'versionsCompare')
+     || dcUtils::versionsCompare(DC_VERSION, $dc_min, '<', false)) {
+        throw new Exception(sprintf(
+            '%s requires Dotclear %s',
+            $mod_id,
+            $dc_min
+        ));
+    }
+
+    # Set version
+    dcCore::app()->setVersion($mod_id, $new_version);
+
+    return true;
+} catch (Exception $e) {
+    dcCore::app()->error->add($e->getMessage());
 }
 
-$core->setVersion('templator',$new_version);
-return true;
-?>
+return false;

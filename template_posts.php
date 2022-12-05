@@ -2,78 +2,86 @@
 # -- BEGIN LICENSE BLOCK ----------------------------------
 #
 # This file is part of templator a plugin for Dotclear 2.
-# 
+#
 # Copyright (c) 2010 Osku and contributors
 # Licensed under the GPL version 2.0 license.
 # A copy of this license is available in LICENSE file or at
 # http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 #
 # -- END LICENSE BLOCK ------------------------------------
-if (!defined('DC_CONTEXT_ADMIN')) { return; }
+if (!defined('DC_CONTEXT_ADMIN')) {
+    return;
+}
 
 $template = (!empty($_REQUEST['template']) || $_REQUEST['template'] == '0') ? $_REQUEST['template'] : '';
 
-$this_url = $p_url.'&amp;m=template_posts&amp;template='.rawurlencode($template);
+$this_url = $p_url . '&amp;m=template_posts&amp;template=' . rawurlencode($template);
 
-$page = !empty($_GET['page']) ? $_GET['page'] : 1;
-$nb_per_page =  30;
+$page        = !empty($_GET['page']) ? $_GET['page'] : 1;
+$nb_per_page = 30;
 
 # Unselect the template
-if (!empty($_POST['initialise']) && $core->auth->check('publish,contentadmin',$core->blog->id))
-{
-	try {
-		$core->meta->delMeta($template,'template');
-		http::redirect($p_url.'&del='.$template);
-	} catch (Exception $e) {
-		$core->error->add($e->getMessage());
-	}
+if (!empty($_POST['initialise']) && dcCore::app()->auth->check('publish,contentadmin', dcCore::app()->blog->id)) {
+    try {
+        dcCore::app()->meta->delMeta($template, 'template');
+        http::redirect($p_url . '&del=' . $template);
+    } catch (Exception $e) {
+        dcCore::app()->error->add($e->getMessage());
+    }
 }
 
-$params = array();
-$params['limit'] = array((($page-1)*$nb_per_page),$nb_per_page);
+$params               = [];
+$params['limit']      = [(($page - 1) * $nb_per_page),$nb_per_page];
 $params['no_content'] = true;
 
-$params['meta_id'] = $template;
+$params['meta_id']   = $template;
 $params['meta_type'] = 'template';
 $params['post_type'] = '';
 
 # Get posts
 try {
-	$posts = $core->meta->getPostsByMeta($params);
-	$counter = $core->meta->getPostsByMeta($params,true);
-	$post_list = new adminPostList($core,$posts,$counter->f(0));
+    $posts     = dcCore::app()->meta->getPostsByMeta($params);
+    $counter   = dcCore::app()->meta->getPostsByMeta($params, true);
+    $post_list = new adminPostList($posts, $counter->f(0));
 } catch (Exception $e) {
-	$core->error->add($e->getMessage());
+    dcCore::app()->error->add($e->getMessage());
 }
 
 # Actions combo box
-$combo_action = array();
-if ($core->auth->check('publish,contentadmin',$core->blog->id))
-{
-	$combo_action[__('Status')] = array(
-		__('Publish') => 'publish',
-		__('Unpublish') => 'unpublish',
-		__('Schedule') => 'schedule',
-		__('Mark as pending') => 'pending'
-	);
+$combo_action = [];
+if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
+    dcAuth::PERMISSION_PUBLISH,
+    dcAuth::PERMISSION_CONTENT_ADMIN,
+]), dcCore::app()->blog->id)) {
+    $combo_action[__('Status')] = [
+        __('Publish')         => 'publish',
+        __('Unpublish')       => 'unpublish',
+        __('Schedule')        => 'schedule',
+        __('Mark as pending') => 'pending',
+    ];
 }
-$combo_action[__('Mark')] = array(
-	__('Mark as selected') => 'selected',
-	__('Mark as unselected') => 'unselected'
-);
-$combo_action[__('Change')] = array(__('Change category') => 'category');
-if ($core->auth->check('admin',$core->blog->id))
-{
-	$combo_action[__('Change')] = array_merge($combo_action[__('Change')],
-		array(__('Change author') => 'author'));
+$combo_action[__('Mark')] = [
+    __('Mark as selected')   => 'selected',
+    __('Mark as unselected') => 'unselected',
+];
+$combo_action[__('Change')] = [__('Change category') => 'category'];
+if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
+    dcAuth::PERMISSION_ADMIN,
+]), dcCore::app()->blog->id)) {
+    $combo_action[__('Change')] = array_merge(
+        $combo_action[__('Change')],
+        [__('Change author') => 'author']
+    );
 }
-if ($core->auth->check('delete,contentadmin',$core->blog->id))
-{
-	$combo_action[__('Delete')] = array(__('Delete') => 'delete');
+if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
+    dcAuth::PERMISSION_DELETE,
+    dcAuth::PERMISSION_CONTENT_ADMIN,
+]), dcCore::app()->blog->id)) {
+    $combo_action[__('Delete')] = [__('Delete') => 'delete'];
 }
 
 # --BEHAVIOR-- adminPostsActionsCombo
-$core->callBehavior('adminPostsActionsCombo',array(&$combo_action));
+dcCore::app()->callBehavior('adminPostsActionsCombo', [&$combo_action]);
 
 ?>
 <html>
@@ -93,42 +101,46 @@ $core->callBehavior('adminPostsActionsCombo',array(&$combo_action));
 </head>
 <body>
 
-<h2><?php echo html::escapeHTML($core->blog->name); ?> &rsaquo;
+<h2><?php echo html::escapeHTML(dcCore::app()->blog->name); ?> &rsaquo;
 <span class="page-title"><?php echo __('Unselect specific template'); ?></span></h2>
 
 <?php
 
-echo '<p><a href="'.$p_url.'">'.__('Back to templates list').'</a></p>';
+echo '<p><a href="' . $p_url . '">' . __('Back to templates list') . '</a></p>';
 
-if (!$core->error->flag())
-{
-	# Show posts
-	$post_list->display($page,$nb_per_page,
-	'<form action="posts_actions.php" method="post" id="form-entries">'.
-	
-	'%s'.
-	
-	'<div class="two-cols">'.
-	'<p class="col checkboxes-helpers"></p>'.
-	
-	'<p class="col right">'.__('Selected entries action:').' '.
-	form::combo('action',$combo_action).
-	'<input type="submit" value="'.__('ok').'" /></p>'.
-	form::hidden('post_type','').
-	form::hidden('redir',$p_url.'&amp;m=template_posts&amp;tag='.
-		str_replace('%','%%',rawurlencode($template)).'&amp;page='.$page).
-	$core->formNonce().
-	'</div>'.
-	'</form>');
-	
-	# Remove tag
-	if (!$posts->isEmpty() && $core->auth->check('contentadmin',$core->blog->id)) {
-		echo
-		'<form id="template_change" action="'.$this_url.'" method="post">'.
-		'<p><input type="submit" name="initialise" value="'.__('Unselect the template').'" />'.
-		$core->formNonce().'</p>'.
-		'</form>';
-	}
+if (!dcCore::app()->error->flag()) {
+    # Show posts
+    $post_list->display(
+        $page,
+        $nb_per_page,
+        '<form action="posts_actions.php" method="post" id="form-entries">' .
+
+        '%s' .
+
+        '<div class="two-cols">' .
+        '<p class="col checkboxes-helpers"></p>' .
+
+        '<p class="col right">' . __('Selected entries action:') . ' ' .
+        form::combo('action', $combo_action) .
+        '<input type="submit" value="' . __('ok') . '" /></p>' .
+        form::hidden('post_type', '') .
+        form::hidden('redir', $p_url . '&amp;m=template_posts&amp;tag=' .
+            str_replace('%', '%%', rawurlencode($template)) . '&amp;page=' . $page) .
+        dcCore::app()->formNonce() .
+        '</div>' .
+        '</form>'
+    );
+
+    # Remove tag
+    if (!$posts->isEmpty() && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
+        dcAuth::PERMISSION_CONTENT_ADMIN,
+    ]), dcCore::app()->blog->id)) {
+        echo
+        '<form id="template_change" action="' . $this_url . '" method="post">' .
+        '<p><input type="submit" name="initialise" value="' . __('Unselect the template') . '" />' .
+        dcCore::app()->formNonce() . '</p>' .
+        '</form>';
+    }
 }
 ?>
 </body>
