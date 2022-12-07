@@ -1,204 +1,165 @@
-# Language: Français
-# Module: templator - 1.3.3
-# Date: 2012-10-02 12:59:08
-# Translated with translater 1.5
-
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: templator 1.3.3\n"
+"Project-Id-Version: templator 1.4-dev\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2012-10-02T12:59:08+00:00\n"
-"Last-Translator: osku\n"
+"PO-Revision-Date: 2022-12-07T20:57:29+00:00\n"
+"Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: _admin.php:15
-msgid "Templates"
-msgstr "Templates"
-
-#: _admin.php:20
 msgid "manage templates"
 msgstr "gérer les templates"
 
-#: _admin.php:67
-msgid "Entry template:"
-msgstr "Template du billet :"
+msgid "Templates engine"
+msgstr "Moteur de templates"
 
-#: _admin.php:90
+msgid "Entries per page"
+msgstr "Entrées par page"
+
+msgid "Select template:"
+msgstr "Sélectionner le template :"
+
 msgid "Appearance"
 msgstr "Aspect"
 
-#: _admin.php:90
 msgid "Select the template"
 msgstr "Sélectionner le template"
 
-#: _admin.php:137
-msgid "Select template for these entries"
-msgstr "Sélectionner le template pour ces billets"
+msgid "Entries template updated."
+msgstr "Templates de billets mis à jour"
 
-#: _admin.php:139
-msgid "Choose template:"
-msgstr "Choisir le template :"
+msgid "Entry template"
+msgstr "Template de billet"
 
-#: _install.php:17
-msgid "Version 2.3.1 of Dotclear at least is required for this version of Templator."
-msgstr "La version 2.3.1 de Dotclear est requise pour version du module Templator."
+msgid "Select template for the selection"
+msgstr "Sélectionner le template pour la sélection :"
 
-#: _prepend.php:26
+msgid "No specific template"
+msgstr "Aucun template additionnel"
+
 msgid "Templator › Rendering"
 msgstr "Templator › Rendu"
 
-#: _prepend.php:34
 msgid "Template:"
 msgstr "Template&nbsp;:"
 
-#: advanced.php:17
-#: edit.php:52
-#: index.php:192
-#: template_posts.php:81
-msgid "Templator"
-msgstr "Templator"
-
-#: advanced.php:23
-#: edit.php:67
-#: index.php:205
-msgid "Supplementary templates"
-msgstr "Templates supplémentaires"
-
-#: advanced.php:23
-msgid "Database informations"
-msgstr "Informations base de données"
-
-#: advanced.php:45
-msgid "available template"
-msgstr "template disponible"
-
-#: advanced.php:47
-msgid "missing template"
-msgstr "template manquant"
-
-#: advanced.php:74
-msgid "No specific templates on this blog."
-msgstr "Aucun template spécifique sur ce blog."
-
-#: edit.php:67
-msgid "Edit the template"
-msgstr "Modifier le template"
-
-#: edit.php:90
-msgid "This file is not writable. Please check your files permissions."
-msgstr "Ce fichier ne peut pas être modifié. Veuillez vérifier les permissions des fichiers."
-
-#: inc/admin.pager.templator.php:28
 msgid "Template widget"
 msgstr "Template widget"
 
-#: inc/admin.pager.templator.php:87
 msgid "details"
 msgstr "détails"
 
-#: inc/admin.pager.templator.php:104
 msgid "copy"
 msgstr "copier"
 
-#: inc/admin.pager.templator.php:104
 msgid "copy the template"
 msgstr "copier le template"
 
-#: inc/admin.pager.templator.php:110
 msgid "delete the template"
 msgstr "supprimer le template"
 
-#: inc/class.templator.php:203
-msgid "Why copy file content in the same file?"
-msgstr "Pourquoi copier le contenu du fichier dans le même fichier ?"
+msgid "File already exists."
+msgstr "Le fichier existe déjà"
 
-#: index.php:91
-msgid "The plugin is unusable with your configuration. You have to change file permissions."
-msgstr "L'extension est inutilisable avec votre configuration. Vous devez modifier les permissions des fichiers."
-
-#: index.php:100
 msgid "Filename is empty."
 msgstr "Le nom de fichier est vide."
 
-#: index.php:181
 msgid "The new template has been successfully created."
 msgstr "Un noueau template a été créé avec succès."
 
-#: index.php:182
-msgid "The template has been successfully removed."
-msgstr "Le template a été supprimé avec succès."
-
-#: index.php:183
 msgid "The template has been successfully copied."
 msgstr "Le template a été copié avec succès."
 
-#: index.php:210
-msgid "Are you sure you want to remove the template \"%s\"?"
-msgstr "Êtes-vous sûr(e) de vouloir supprimer le template \"%s\" ?"
+msgid "The template has been successfully removed."
+msgstr "Le template a été supprimé avec succès."
 
-#: index.php:222
-msgid "To copy the template <strong>%s</strong>, you need to fill a new filename."
-msgstr "Pour copier le template <strong>%s</strong>, il est nécessaire de renseigner un nom de fichier."
+msgid "The plugin is unusable with your configuration. You have to change file permissions."
+msgstr "L'extension est inutilisable avec votre configuration. Vous devez modifier les permissions des fichiers."
 
-#: index.php:224
-msgid "New filename:"
-msgstr "Nouveau nom de fichier"
+msgid "Templator"
+msgstr "Templator"
 
-#: index.php:226
-#: index.php:245
-msgid "Copy"
-msgstr "Copier"
-
-#: index.php:241
-msgid "To copy the template <strong>%s</strong> (%s), you need to choose a category."
-msgstr "Pour copier le template  <strong>%s</strong> (%s), il est nécessaire de choisir une catégorie."
-
-#: index.php:243
-msgid "Target category:"
-msgstr "Catégorie cible :"
-
-#: index.php:253
-#: index.php:258
 msgid "New template"
 msgstr "Nouveau template"
 
-#: index.php:259
 msgid "Template source:"
 msgstr "Template source :"
 
-#: index.php:261
 msgid "Filename:"
 msgstr "Nom de fichier :"
 
-#: index.php:263
-msgid "Extension <strong><code>.html</code></strong> is automatically added to filename"
-msgstr "L'extension <strong><code>.html</code></strong> est automatiquement ajouté au nom du fichier."
+msgid "Extension .html is automatically added to filename."
+msgstr "L'extension .html est automatiquement ajouté au nom de fichier."
 
-#: index.php:279
+msgid "Required only for category template."
+msgstr "Requis uniquement pour un template de catégorie"
+
+msgid "Copy available template"
+msgstr "Copier un template disponible"
+
+msgid "New filename:"
+msgstr "Nouveau nom de fichier :"
+
+msgid "To copy the template <strong>%s</strong>, you need to fill a new filename."
+msgstr "Pour copier le template <strong>%s</strong>, il est nécessaire de renseigner un nom de fichier."
+
+msgid "Copy"
+msgstr "Copier"
+
+msgid "Target category:"
+msgstr "Catégorie cible :"
+
+msgid "To copy the template <strong>%s</strong> (%s), you need to choose a category."
+msgstr "Pour copier le template  <strong>%s</strong> (%s), il est nécessaire de choisir une catégorie."
+
+msgid "Delete available template"
+msgstr "Effacer un template disponible"
+
+msgid "Are you sure you want to remove the template \"%s\"?"
+msgstr "Êtes-vous sûr(e) de vouloir supprimer le template \"%s\" ?"
+
+msgid "Available templates"
+msgstr "Templates disponibles"
+
 msgid "No template."
 msgstr "Aucun template."
 
-#: index.php:308
-#: index.php:310
-msgid "Display templates used for entries in base"
-msgstr "Afficher les templates utilisés pour les billets en base"
+msgid "available template"
+msgstr "template disponible"
 
-#: template_posts.php:85
-msgid "Are you sure you want to unselect the template?"
-msgstr "Êtes-vous sûr(e) de vouloir désélectionner le template ?"
+msgid "missing template"
+msgstr "template manquant"
 
-#: template_posts.php:97
-msgid "Unselect specific template"
-msgstr "Désélectionner le template spécifique"
+msgid "Used templates"
+msgstr "Templates utilisés"
 
-#: template_posts.php:101
-msgid "Back to templates list"
-msgstr "Retour à la liste des templates"
+msgid "No specific templates on this blog."
+msgstr "Aucun template spécifique sur ce blog."
 
-#: template_posts.php:128
-msgid "Unselect the template"
-msgstr "Désélectionner le template"
+msgid "Edit template"
+msgstr "Modifier un template"
+
+msgid "This file is not writable. Please check your files permissions."
+msgstr "Ce fichier ne peut pas être modifié. Veuillez vérifier les permissions des fichiers."
+
+msgid "Unselect template"
+msgstr "Désélectionner un template"
+
+msgid "Unselect template \"%s\""
+msgstr "Désélectionner le template \"%s\""
+
+msgid "There is no entries"
+msgstr "Il n'y a pas de billet"
+
+msgid "Unselect template for selected entries"
+msgstr "Désélectionner ce template pour la sélection de billets"
+
+msgid "Manage additional templates"
+msgstr "Gérer les templates additionnels"
+
+msgid "Templates"
+msgstr "Templates"
 
