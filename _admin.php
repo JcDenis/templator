@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * @brief templator, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugin
+ *
+ * @author Osku and contributors
+ *
+ * @copyright Jean-Christian Denis
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
@@ -31,16 +41,16 @@ if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
     dcCore::app()->addBehavior('adminAfterPageCreate', ['templatorBehaviors','adminBeforePostUpdate']);
     dcCore::app()->addBehavior('adminBeforePageUpdate', ['templatorBehaviors','adminBeforePostUpdate']);
 
-    dcCore::app()->addBehavior('adminPostsActions', ['templatorBehaviors','adminPostsActions']);
-    dcCore::app()->addBehavior('adminPagesActions', ['templatorBehaviors','adminPostsActions']);
+    dcCore::app()->addBehavior('adminPostsActionsV2', ['templatorBehaviors','adminPostsActionsV2']);
+    dcCore::app()->addBehavior('adminPagesActionsV2', ['templatorBehaviors','adminPostsActionsV2']);
 
     dcCore::app()->addBehavior('adminFiltersListsV2', function (ArrayObject $sorts) {
         $sorts['templator'] = [
             __('Templates engine'),
             [
-                __('Date')        => 'post_upddt',
-                __('Title')       => 'post_title',
-                __('Category')    => 'cat_id',
+                __('Date')     => 'post_upddt',
+                __('Title')    => 'post_title',
+                __('Category') => 'cat_id',
             ],
             'post_upddt',
             'desc',
@@ -65,10 +75,9 @@ class templatorBehaviors
             $selected  = $post_meta->isEmpty() ? '' : $post_meta->meta_id;
         }
 
-        $sidebar_items['options-box']['items']['templator'] =
-        	'<div id="templator">' .
+        $sidebar_items['options-box']['items']['templator'] = '<div id="templator">' .
             '<h5>' . __('Template') . '</h5>' .
-            '<p><label for="post_tpl">' . __('Select template:') . '</label>' . 
+            '<p><label for="post_tpl">' . __('Select template:') . '</label>' .
             form::combo('post_tpl', self::getTemplateCombo(), $selected) . '</p>' .
             '</div>';
     }
@@ -85,7 +94,7 @@ class templatorBehaviors
         }
     }
 
-    public static function adminPostsActions(dcPostsActions $pa)
+    public static function adminPostsActionsV2(dcPostsActions $pa)
     {
         $pa->addAction(
             [
@@ -114,8 +123,8 @@ class templatorBehaviors
                     }
                 }
 
-            	dcAdminNotices::addSuccessNotice(__('Entries template updated.'));
-            	$pa->redirect(true);
+                dcAdminNotices::addSuccessNotice(__('Entries template updated.'));
+                $pa->redirect(true);
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
             }
@@ -125,7 +134,7 @@ class templatorBehaviors
             dcPage::breadcrumb([
                 html::escapeHTML(dcCore::app()->blog->name) => '',
                 $pa->getCallerTitle()                       => $pa->getRedirection(true),
-                __('Entry template')    => '',
+                __('Entry template')                        => '',
             ])
         );
 

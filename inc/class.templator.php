@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * @brief templator, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugin
+ *
+ * @author Osku and contributors
+ *
+ * @copyright Jean-Christian Denis
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 if (!defined('DC_RC_PATH')) {
     return null;
 }
@@ -141,10 +151,10 @@ class dcTemplator
         $source = [
             'c' => file_get_contents($base),
             'w' => $this->getDestinationFile($name) !== false,
-            'f' => $f, ];
+        ];
 
         if (!$source['w']) {
-            throw new Exception(sprintf(__('File %s is not readable'), $source));
+            throw new Exception(sprintf(__('File %s is not readable'), $name));
         }
 
         if ($type == 'empty') {
@@ -185,22 +195,18 @@ class dcTemplator
     public function copypasteTpl($name, $source)
     {
         if ($name == $source) {
-            throw new Exception(__('Why copy file content in the same file?'));
+            throw new Exception(__('File already exists.'));
         }
 
         $file = $this->getSourceContent($source);
 
-        $source = [
+        $data = [
             'c' => $file['c'],
             'w' => $this->getDestinationFile($name) !== false,
-            'f' => $f, ];
+        ];
 
-        if (!$source['w']) {
+        if (!$data['w']) {
             throw new Exception(sprintf(__('File %s is not readable'), $source));
-        }
-
-        if ($type == 'empty') {
-            $source['c'] = '';
         }
 
         try {
@@ -210,7 +216,7 @@ class dcTemplator
                 throw new Exception();
             }
 
-            $content = $source['c'];
+            $content = $data['c'];
 
             if (!is_dir(dirname($dest))) {
                 files::makeDir(dirname($dest));

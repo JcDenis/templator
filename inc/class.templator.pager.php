@@ -1,15 +1,15 @@
 <?php
-
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of templator a plugin for Dotclear 2.
-#
-# Copyright (c) 2010 Osku and contributors
-# Licensed under the GPL version 2.0 license.
-# A copy of this license is available in LICENSE file or at
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief templator, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugin
+ *
+ * @author Osku and contributors
+ *
+ * @copyright Jean-Christian Denis
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 if (!defined('DC_RC_PATH')) {
     return;
 }
@@ -28,14 +28,13 @@ class templatorPager
         $class       = 'media-item media-col-' . ($i % 2);
         $details     = $special = '';
         $widget_icon = '<span class="widget" title="' . __('Template widget') . '">&diams;</span>';
-        $part = 'copy';
+        $part        = 'copy';
 
-        if (preg_match('/^category-(.+)$/', $f->basename)) {
-            // That is ugly.
-            $cat_id      = str_replace('category-', '', $f->basename);
-            $cat_id      = str_replace('.html', '', $cat_id);
-            $cat_parents = dcCore::app()->blog->getCategoryParents($cat_id);
+        if (preg_match('/^category-(.+).html$/', $f->basename, $cat_id)) {
+            $cat_id      = (int) $cat_id[1];
+            $category    = dcCore::app()->blog->getCategory($cat_id);
             $full_name   = '';
+            $cat_parents = dcCore::app()->blog->getCategoryParents($cat_id);
             while ($cat_parents->fetch()) {
                 $full_name = $cat_parents->cat_title . ' &rsaquo; ';
             };
@@ -43,20 +42,19 @@ class templatorPager
             $params['cat_id']    = $cat_id;
             $params['post_type'] = '';
             $icon                = dcPage::getPF('templator/img/template-alt.png');
-            $part            = 'copycat';;
+            $part                = 'copycat';
 
             try {
                 $counter = dcCore::app()->blog->getPosts($params, true);
+                if ($counter->f(0) == 0) {
+                    $count = __('No entry');
+                } elseif ($counter->f(0) == 1) {
+                    $count = '<strong>' . $counter->f(0) . '</strong> <a href="posts.php?cat_id=' . $cat_id . '">' . __('entry') . '</a>';
+                } else {
+                    $count = '<strong>' . $counter->f(0) . '</strong> <a href="posts.php?cat_id=' . $cat_id . '">' . __('entries') . '</a>';
+                }
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
-            }
-
-            if ($counter->f(0) == 0) {
-                $count = __('No entry');
-            } elseif ($counter->f(0) == 1) {
-                $count = '<strong>' . $counter->f(0) . '</strong> <a href="posts.php?cat_id=' . $cat_id . '">' . __('entry') . '</a>';
-            } else {
-                $count = '<strong>' . $counter->f(0) . '</strong> <a href="posts.php?cat_id=' . $cat_id . '">' . __('entries') . '</a>';
             }
         } elseif (preg_match('/^widget-(.+)$/', $f->basename)) {
             $count   = '&nbsp;';
@@ -69,20 +67,20 @@ class templatorPager
 
             try {
                 $counter = dcCore::app()->meta->getPostsByMeta($params, true);
+                $url     = dcCore::app()->adminurl->get('admin.plugin.templator', [
+                    'part'  => 'posts',
+                    'file'  => $fname,
+                    'redir' => dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'files']),
+                ]);
+                if ($counter->f(0) == 0) {
+                    $count = __('No entry');
+                } elseif ($counter->f(0) == 1) {
+                    $count = '<strong>' . $counter->f(0) . '</strong> <a href="' . $url . '">' . __('entry') . '</a>';
+                } else {
+                    $count = '<strong>' . $counter->f(0) . '</strong> <a href="' . $url . '">' . __('entries') . '</a>';
+                }
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
-            }
-            $url = dcCore::app()->adminurl->get('admin.plugin.templator', [
-                'part'  => 'posts', 
-                'file'  => $fname,
-                'redir' => dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'files']),
-            ]);
-            if ($counter->f(0) == 0) {
-                $count = __('No entry');
-            } elseif ($counter->f(0) == 1) {
-                $count = '<strong>' . $counter->f(0) . '</strong> <a href="' . $url . '">' . __('entry') . '</a>';
-            } else {
-                $count = '<strong>' . $counter->f(0) . '</strong> <a href="' . $url . '">' . __('entries') . '</a>';
             }
         }
 
@@ -90,14 +88,14 @@ class templatorPager
         '<img src="' . $icon . '" alt="" /></a>' .
         '<ul>' .
         '<li><a class="media-link" href="' . $link_edit . '">' . $fname . '</a> ' . $special . '</li>';
-/*
-        if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-            dcAuth::PERMISSION_CONTENT_ADMIN,
-            initTemplator::PERMISSION_TEMPLATOR,
-        ]), dcCore::app()->blog->id)) {
-            $details = ' - <a href="' . $link . '">' . __('details') . '</a>';
-        }
-*/
+        /*
+                if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
+                    dcAuth::PERMISSION_CONTENT_ADMIN,
+                    initTemplator::PERMISSION_TEMPLATOR,
+                ]), dcCore::app()->blog->id)) {
+                    $details = ' - <a href="' . $link . '">' . __('details') . '</a>';
+                }
+        */
         if (!$f->d) {
             $res .= '<li>' . $count . '</li>' .
             '<li>' .
@@ -109,12 +107,12 @@ class templatorPager
 
         $res .= '<li class="media-action">&nbsp;';
 
-        $res .= '<a class="media-remove" href="' . 
+        $res .= '<a class="media-remove" href="' .
         dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => $part, 'file' => $f->basename]) . '">' .
         '<img src="' . dcPage::getPF('templator/img/copy.png') . '" alt="' . __('copy') . '" title="' . __('copy the template') . '" /></a>&nbsp;';
 
         if ($f->del) {
-            $res .= '<a class="media-remove" href="' . 
+            $res .= '<a class="media-remove" href="' .
             dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'delete', 'file' => $f->basename]) . '">' .
             '<img src="' . dcPage::getPF('templator/img/delete.png') . '" alt="' . __('delete') . '" title="' . __('delete the template') . '" /></a>';
         }

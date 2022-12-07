@@ -1,4 +1,15 @@
 <?php
+/**
+ * @brief templator, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugin
+ *
+ * @author Osku and contributors
+ *
+ * @copyright Jean-Christian Denis
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 if (!defined('DC_CONTEXT_ADMIN')) {
     return null;
 }
@@ -24,6 +35,7 @@ if (in_array($part, ['files', 'delete'])) {
 
 if (in_array($part, ['new', 'copycat'])) {
     $has_categories = false;
+
     try {
         $categories = dcCore::app()->blog->getCategories(['post_type' => 'post']);
 
@@ -63,7 +75,7 @@ if (in_array($part, ['new', 'copycat'])) {
 
 ### Action ###
 
-/**
+/*
  * Duplicate dc template
  */
 if ('new' == $part && !empty($_POST['filesource'])) {
@@ -86,13 +98,13 @@ if ('new' == $part && !empty($_POST['filesource'])) {
     }
 }
 
-/**
+/*
  * Copy tempaltor template
  */
 if ('copy' == $part && !empty($_POST['filename'])) {
     try {
         dcCore::app()->templator->copypasteTpl(
-            rawurldecode($_POST['filename']) . '.html', 
+            rawurldecode($_POST['filename']) . '.html',
             rawurldecode($_POST['file'])
         );
 
@@ -105,13 +117,13 @@ if ('copy' == $part && !empty($_POST['filename'])) {
     }
 }
 
-/**
+/*
  * Copy templator category template
  */
 if ('copycat' == $part && !empty($_POST['filecat'])) {
     try {
         dcCore::app()->templator->copypasteTpl(
-            'category-' . rawurldecode($_POST['filecat']) . '.html', 
+            'category-' . rawurldecode($_POST['filecat']) . '.html',
             rawurldecode($_POST['file'])
         );
 
@@ -124,7 +136,7 @@ if ('copycat' == $part && !empty($_POST['filecat'])) {
     }
 }
 
-/**
+/*
  * Delete tempaltor template
  */
 if ('delete' == $part && !empty($_POST['file'])) {
@@ -144,7 +156,7 @@ if ('delete' == $part && !empty($_POST['file'])) {
 
 ### Display ###
 
-/**
+/*
  * Check
  */
 
@@ -154,23 +166,23 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     '<html><head><title>' . __('Templator') . '</title>' .
     '</head><body>' .
     dcPage::breadcrumb([
-        __('Plugins') => '',
+        __('Plugins')          => '',
         __('Templates engine') => dcCore::app()->adminurl->get('admin.plugin.templator'),
-        __('New template') => '',
+        __('New template')     => '',
     ]) .
     dcPage::notices();
 
-/**
- * Duplicate dotclear template
- */
+    /*
+     * Duplicate dotclear template
+     */
 } elseif ('new' == $part) {
     echo
     '<html><head><title>' . __('Templator') . '</title>' .
     '</head><body>' .
     dcPage::breadcrumb([
-        __('Plugins') => '',
+        __('Plugins')          => '',
         __('Templates engine') => dcCore::app()->adminurl->get('admin.plugin.templator'),
-        __('New template') => '',
+        __('New template')     => '',
     ]) .
     dcPage::notices() .
 
@@ -183,28 +195,28 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     '<p class="form-note">' . __('Extension .html is automatically added to filename.') . '</p>';
 
     if ($has_categories) {
-        echo 
-        '<p><label for="filecat" class="required"><abbr title="' . __('Required field') . '">*</abbr>' . __('Category:') .'</label> ' .
+        echo
+        '<p><label for="filecat" class="required"><abbr title="' . __('Required field') . '">*</abbr>' . __('Category:') . '</label> ' .
         form::combo('filecat', $categories_combo, '') . '</p>' .
         '<p class="form-note">' . __('Required only for category template.') . '</p>';
     }
 
     echo
-    '<p>' . 
+    '<p>' .
     dcCore::app()->formNonce() .
     '<input type="submit" value="' . __('Create') . '" /></p>' .
     '</form>';
 
-/**
- * Copy templator template
- */
+    /*
+     * Copy templator template
+     */
 } elseif ('copy' == $part && !empty($_REQUEST['file'])) {
     echo
     '<html><head><title>' . __('Templator') . '</title>' .
     '</head><body>' .
     dcPage::breadcrumb([
-        __('Plugins') => '',
-        __('Templates engine') => dcCore::app()->adminurl->get('admin.plugin.templator'),
+        __('Plugins')                 => '',
+        __('Templates engine')        => dcCore::app()->adminurl->get('admin.plugin.templator'),
         __('Copy available template') => '',
     ]) .
     dcPage::notices() .
@@ -224,11 +236,11 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     form::hidden('file', html::escapeHTML($_REQUEST['file'])) . '</p>' .
     '</form>';
 
-/**
- * Copy templator category template
- */
+    /*
+     * Copy templator category template
+     */
 } elseif ('copycat' == $part && !empty($_REQUEST['file'])) {
-    $category_id = str_replace(['category-','.html'], '', $_REQUEST['file']);
+    $category_id = (int) str_replace(['category-','.html'], '', $_REQUEST['file']);
     $cat_parents = dcCore::app()->blog->getCategoryParents($category_id);
     $full_name   = '';
     while ($cat_parents->fetch()) {
@@ -240,8 +252,8 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     '<html><head><title>' . __('Templator') . '</title>' .
     '</head><body>' .
     dcPage::breadcrumb([
-        __('Plugins') => '',
-        __('Templates engine') => dcCore::app()->adminurl->get('admin.plugin.templator'),
+        __('Plugins')                 => '',
+        __('Templates engine')        => dcCore::app()->adminurl->get('admin.plugin.templator'),
         __('Copy available template') => '',
     ]) .
     dcPage::notices() .
@@ -261,16 +273,16 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     form::hidden('file', html::escapeHTML($_REQUEST['file'])) . '</p>' .
     '</form>';
 
-/**
- * Delete templator template
- */
+    /*
+     * Delete templator template
+     */
 } elseif ('delete' == $part && !empty($_REQUEST['file'])) {
     echo
     '<html><head><title>' . __('Templator') . '</title>' .
     '</head><body>' .
     dcPage::breadcrumb([
-        __('Plugins') => '',
-        __('Templates engine') => dcCore::app()->adminurl->get('admin.plugin.templator'),
+        __('Plugins')                   => '',
+        __('Templates engine')          => dcCore::app()->adminurl->get('admin.plugin.templator'),
         __('Delete available template') => '',
     ]) .
     dcPage::notices() .
@@ -287,16 +299,16 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     form::hidden('file', html::escapeHTML($_GET['file'])) . '</p>' .
     '</form>';
 
-/**
- * List templator templates
- */
+    /*
+     * List templator templates
+     */
 } elseif ('files' == $part) {
     echo
     '<html><head><title>' . __('Templator') . '</title>' .
     '</head><body>' .
     dcPage::breadcrumb([
-        __('Plugins') => '',
-        __('Templates engine') => dcCore::app()->adminurl->get('admin.plugin.templator'),
+        __('Plugins')             => '',
+        __('Templates engine')    => dcCore::app()->adminurl->get('admin.plugin.templator'),
         __('Available templates') => '',
     ]) .
     dcPage::notices() .
@@ -309,9 +321,7 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
         $filter = new adminGenericFilterV2('templator');
         $filter->add(dcAdminFilters::getPageFilter());
 
-        $pager            = new dcPager($filter->page, count($items), $filter->nb, 10);
-        $pager->html_prev = __('&#171;prev.');
-        $pager->html_next = __('next&#187;');
+        $pager = new dcPager($filter->page, count($items), $filter->nb, 10);
 
         echo
         '<div class="media-list">' .
@@ -326,9 +336,9 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
         '</div>';
     }
 
-/**
- * List Used templator template
- */
+    /*
+     * List Used templator template
+     */
 } elseif ('used' == $part) {
     $tags = dcCore::app()->meta->getMetadata(['meta_type' => 'template']);
     $tags = dcCore::app()->meta->computeMetaStats($tags);
@@ -356,12 +366,12 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
         }
 
         $cols[$col] .= '<tr class="line">' .
-            '<td class="maximal"><a href="' . 
+            '<td class="maximal"><a href="' .
             dcCore::app()->adminurl->get('admin.plugin.templator', [
-                'part'  => 'posts', 
+                'part'  => 'posts',
                 'file'  => $tags->meta_id,
-                'redir' =>  dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'used']),
-            ]) .'">' . $tags->meta_id . '</a> ' . $img_status . '</td>' .
+                'redir' => dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'used']),
+            ]) . '">' . $tags->meta_id . '</a> ' . $img_status . '</td>' .
             '<td class="nowrap"><strong>' . $tags->count . '</strong> ' .
             (($tags->count == 1) ? __('entry') : __('entries')) . '</td>' .
         '</tr>';
@@ -376,9 +386,9 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     dcPage::cssLoad(dcPage::getPF('tags/style.css')) .
     '</head><body>' .
     dcPage::breadcrumb([
-        __('Plugins') => '',
+        __('Plugins')          => '',
         __('Templates engine') => dcCore::app()->adminurl->get('admin.plugin.templator'),
-        __('Used templates') => '',
+        __('Used templates')   => '',
     ]) .
     dcPage::notices() .
     '<h3>' . __('Used templates') . '</h3>';
@@ -394,9 +404,9 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
         echo '<p>' . __('No specific templates on this blog.') . '</p>';
     }
 
-/**
- * Edit emplator template
- */
+    /*
+     * Edit emplator template
+     */
 } elseif ('edit' == $part && !empty($_REQUEST['file'])) {
     try {
         try {
@@ -405,9 +415,9 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
             $name = $file['f'];
 
             if (preg_match('/^category-(.+).html$/', $name, $cat_id)) {
-                $category    = dcCore::app()->blog->getCategory($cat_id[1]);
+                $category    = dcCore::app()->blog->getCategory((int) $cat_id[1]);
                 $full_name   = '';
-                $cat_parents = dcCore::app()->blog->getCategoryParents($cat_id[1]);
+                $cat_parents = dcCore::app()->blog->getCategoryParents((int) $cat_id[1]);
                 while ($cat_parents->fetch()) {
                     $full_name = $cat_parents->cat_title . ' &rsaquo; ';
                 };
@@ -453,9 +463,9 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     dcPage::cssModuleLoad('themeEditor/style.css') .
     '</head><body>' .
     dcPage::breadcrumb([
-        __('Plugins') => '',
+        __('Plugins')          => '',
         __('Templates engine') => dcCore::app()->adminurl->get('admin.plugin.templator'),
-        __('Edit template') => '',
+        __('Edit template')    => '',
     ]) .
     dcPage::notices();
 
@@ -490,11 +500,11 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
         }
     }
 
-/**
- * Edit posts options linked to a template
- */
+    /*
+     * Edit posts options linked to a template
+     */
 } elseif ('posts' == $part && (!empty($_REQUEST['file']) || $_REQUEST['file'] == '0')) {
-    $file = $_REQUEST['file'];
+    $file  = $_REQUEST['file'];
     $redir = $_REQUEST['redir'] ?? dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'used']);
 
     # Unselect the template
@@ -516,10 +526,10 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     $filter->add('file', $file);
     $filter->add('post_type', '');
 
-    $params = $filter->params();
+    $params               = $filter->params();
     $params['no_content'] = true;
-    $params['meta_id'] = $file;
-    $params['meta_type'] = 'template';
+    $params['meta_id']    = $file;
+    $params['meta_type']  = 'template';
 
     # Get posts
     try {
@@ -537,13 +547,13 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     $filter->js(dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'posts', 'file' => $file])) .
     '</head><body>' .
     dcPage::breadcrumb([
-        __('Plugins') => '',
-        __('Templates engine') => dcCore::app()->adminurl->get('admin.plugin.templator'),
+        __('Plugins')           => '',
+        __('Templates engine')  => dcCore::app()->adminurl->get('admin.plugin.templator'),
         __('Unselect template') => '',
     ]) .
     dcPage::notices() .
 
-    '<h3>' . __('Unselect template') . '</h3>' .
+    '<h3>' . sprintf(__('Unselect template "%s"'), '<strong>' . $file . '</strong>') . '</h3>' .
     '<p><a class ="back" href="' . $redir . '">' . __('Back') . '</a></p>';
 
     if (!dcCore::app()->error->flag()) {
@@ -565,8 +575,8 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
                 '<div class="two-cols">' .
                 '<p class="col checkboxes-helpers"></p>' .
 
-                '<p class="col right">' . 
-                 '<input type="submit" value="' . __('Unselect template for selcted entries') . '" /></p>' .
+                '<p class="col right">' .
+                 '<input type="submit" value="' . __('Unselect template for selected entries') . '" /></p>' .
                 form::hidden('action', 'unselecttpl') .
                 dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.templator', $filter->values()) .
                 form::hidden('redir', $redir) .
@@ -579,15 +589,15 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
         }
     }
 
-/**
- * Default page
- */
+    /*
+     * Default page
+     */
 } else {
     echo
     '<html><head><title>' . __('Templator') . '</title>' .
     '</head><body>' .
     dcPage::breadcrumb([
-        __('Plugins') => '',
+        __('Plugins')          => '',
         __('Templates engine') => '',
     ]) .
     dcPage::notices();
