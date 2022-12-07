@@ -23,12 +23,12 @@ class pagerTemplator
         $count       = '';
         $params      = [];
         $link        = 'media_item.php?id=' . $f->media_id;
-        $link_edit   = $p_url . '&amp;edit=' . $fname;
+        $link_edit   = dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'edit', 'file' => $f->basename]);
         $icon        = dcPage::getPF('templator/img/template.png');
         $class       = 'media-item media-col-' . ($i % 2);
         $details     = $special = '';
         $widget_icon = '<span class="widget" title="' . __('Template widget') . '">&diams;</span>';
-        $copy_url    = '&amp;copy=';
+        $part = 'copy';
 
         if (preg_match('/^category-(.+)$/', $f->basename)) {
             // That is ugly.
@@ -43,7 +43,7 @@ class pagerTemplator
             $params['cat_id']    = $cat_id;
             $params['post_type'] = '';
             $icon                = dcPage::getPF('templator/img/template-alt.png');
-            $copy_url            = '&amp;copycat=';
+            $part            = 'copycat';;
 
             try {
                 $counter = dcCore::app()->blog->getPosts($params, true);
@@ -72,12 +72,17 @@ class pagerTemplator
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
             }
+            $url = dcCore::app()->adminurl->get('admin.plugin.templator', [
+                'part'  => 'posts', 
+                'file'  => $fname,
+                'redir' => dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'files']),
+            ]);
             if ($counter->f(0) == 0) {
-                $count = '&nbsp;';
+                $count = __('No entry');
             } elseif ($counter->f(0) == 1) {
-                $count = '<strong>' . $counter->f(0) . '</strong> <a href="' . $p_url . '&amp;m=template_posts&amp;template=' . $fname . '">' . __('entry') . '</a>';
+                $count = '<strong>' . $counter->f(0) . '</strong> <a href="' . $url . '">' . __('entry') . '</a>';
             } else {
-                $count = '<strong>' . $counter->f(0) . '</strong> <a href="' . $p_url . '&amp;m=template_posts&amp;template=' . $fname . '">' . __('entries') . '</a>';
+                $count = '<strong>' . $counter->f(0) . '</strong> <a href="' . $url . '">' . __('entries') . '</a>';
             }
         }
 
@@ -85,14 +90,14 @@ class pagerTemplator
         '<img src="' . $icon . '" alt="" /></a>' .
         '<ul>' .
         '<li><a class="media-link" href="' . $link_edit . '">' . $fname . '</a> ' . $special . '</li>';
-
+/*
         if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
             dcAuth::PERMISSION_CONTENT_ADMIN,
             initTemplator::PERMISSION_TEMPLATOR,
         ]), dcCore::app()->blog->id)) {
             $details = ' - <a href="' . $link . '">' . __('details') . '</a>';
         }
-
+*/
         if (!$f->d) {
             $res .= '<li>' . $count . '</li>' .
             '<li>' .
@@ -104,13 +109,13 @@ class pagerTemplator
 
         $res .= '<li class="media-action">&nbsp;';
 
-        $res .= '<a class="media-remove" ' .
-        'href="' . $p_url . $copy_url . rawurlencode($f->basename) . '">' .
+        $res .= '<a class="media-remove" href="' . 
+        dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => $part, 'file' => $f->basename]) . '">' .
         '<img src="' . dcPage::getPF('templator/img/copy.png') . '" alt="' . __('copy') . '" title="' . __('copy the template') . '" /></a>&nbsp;';
 
         if ($f->del) {
-            $res .= '<a class="media-remove" ' .
-            'href="' . $p_url . '&amp;remove=' . rawurlencode($f->basename) . '">' .
+            $res .= '<a class="media-remove" href="' . 
+            dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'delete', 'file' => $f->basename]) . '">' .
             '<img src="' . dcPage::getPF('templator/img/delete.png') . '" alt="' . __('delete') . '" title="' . __('delete the template') . '" /></a>';
         }
 

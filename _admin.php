@@ -7,7 +7,7 @@ if (!defined('DC_CONTEXT_ADMIN')) {
 dcCore::app()->auth->setPermissionType(initTemplator::PERMISSION_TEMPLATOR, __('manage templates'));
 
 dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
-    __('Templates'),
+    __('Templates engine'),
     dcCore::app()->adminurl->get('admin.plugin.templator'),
     urldecode(dcPage::getPF('templator/icon.png')),
     preg_match('/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.templator')) . '(&.*)?$/', $_SERVER['REQUEST_URI']),
@@ -34,6 +34,19 @@ if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
     dcCore::app()->addBehavior('adminPostsActions', ['templatorBehaviors','adminPostsActions']);
     dcCore::app()->addBehavior('adminPagesActions', ['templatorBehaviors','adminPostsActions']);
 
+    dcCore::app()->addBehavior('adminFiltersListsV2', function (ArrayObject $sorts) {
+        $sorts['templator'] = [
+            __('Templates engine'),
+            [
+                __('Date')        => 'post_upddt',
+                __('Title')       => 'post_title',
+                __('Category')    => 'cat_id',
+            ],
+            'post_upddt',
+            'desc',
+            [__('Entries per page'), 30],
+        ];
+    });
 }
 
 class templatorBehaviors

@@ -5,6 +5,7 @@ if (!defined('DC_RC_PATH')) {
 }
 Clearbricks::lib()->autoload([
     'dcTemplator'    => __DIR__ . '/inc/class.templator.php',
+    'templatorMedia' => __DIR__ . '/inc/class.templator.media.php',
     'pagerTemplator' => __DIR__ . '/inc/admin.pager.templator.php',
 ]);
 
