@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<modules xmlns:da="http://dotaddict.org/da/">
+  <module id="templator">
+    <name>Templates engine</name>
+    <version>1.4</version>
+    <author>Osku and contributors</author>
+    <desc>Create and select more templates for your posts</desc>
+    <file>https://github.com/JcDenis/templator/releases/download/v1.4/plugin-templator.zip</file>
+    <da:dcmin>2.24</da:dcmin>
+    <da:details>https://plugins.dotaddict.org/dc2/details/templator</da:details>
+    <da:support>https://github.com/JcDenis/templator</da:support>
+  </module>
+</modules>
