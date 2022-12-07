@@ -13,15 +13,12 @@ $part = $_REQUEST['part'] ?? '';
 ### grab info ###
 
 if (in_array($part, ['files', 'delete'])) {
-    $page           = !empty($_GET['page']) ? $_GET['page'] : 1;
-    $nb_per_page    = 20;
-
+    //Extend dcMedia to change settings to allow .html vs media_exclusion
     $media = new templatorMedia();
     $media->chdir(dcCore::app()->templator->template_dir_name);
     // For users with only templator permission, we use sudo.
     dcCore::app()->auth->sudo([$media,'getDir']);
     $dir   = $media->dir;
-    //if files did not appear in this list, check blog->settings->media_exclusion
     $items = array_values($dir['files']);
 }
 
@@ -308,23 +305,24 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
     if (count($items) == 0) {
         echo '<p><strong>' . __('No template.') . '</strong></p>';
     } else {
-        $pager            = new pager($page, count($items), $nb_per_page, 10);
+        // reuse "used templatro template" filter settings
+        $filter = new adminGenericFilterV2('templator');
+        $filter->add(dcAdminFilters::getPageFilter());
+
+        $pager            = new dcPager($filter->page, count($items), $filter->nb, 10);
         $pager->html_prev = __('&#171;prev.');
         $pager->html_next = __('next&#187;');
 
         echo
-        '<form action="media.php" method="get">' .
-        '</form>' .
-
         '<div class="media-list">' .
-        '<p>' . __('Page(s)') . ' : ' . $pager->getLinks() . '</p>';
+        $pager->getLinks();
 
         for ($i = $pager->index_start, $j = 0; $i <= $pager->index_end; $i++, $j++) {
-            echo pagerTemplator::templatorItemLine($items[$i], $j);
+            echo templatorPager::templatorItemLine($items[$i], $j);
         }
 
         echo
-        '<p class="clear">' . __('Page(s)') . ' : ' . $pager->getLinks() . '</p>' .
+        $pager->getLinks() .
         '</div>';
     }
 
@@ -413,11 +411,10 @@ if (!dcCore::app()->templator->canUseRessources(true)) {
                 while ($cat_parents->fetch()) {
                     $full_name = $cat_parents->cat_title . ' &rsaquo; ';
                 };
-                $full_name = $full_name . dcCore::app()->blog->getCategory($cat_id)->cat_title;
                 $name .= '</strong> (' . $full_name . $category->cat_title . ')<strong>';
             }
         } catch (Exception $e) {
-            $file = $file_default;
+            $file = '';
 
             throw $e;
         }

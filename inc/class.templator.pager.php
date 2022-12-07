@@ -14,7 +14,7 @@ if (!defined('DC_RC_PATH')) {
     return;
 }
 
-class pagerTemplator
+class templatorPager
 {
     public static function templatorItemLine($f, $i)
     {
