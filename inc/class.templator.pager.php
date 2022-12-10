@@ -87,7 +87,7 @@ class templatorPager
         $res = '<div class="' . $class . '"><a class="media-icon media-link" href="' . $link_edit . '">' .
         '<img src="' . $icon . '" alt="" /></a>' .
         '<ul>' .
-        '<li><a class="media-link" href="' . $link_edit . '">' . $fname . '</a> ' . $special . '</li>';
+        '<li><a class="media-link" href="' . $link_edit . '"><img src="images/edit-mini.png" alt="' . __('edit') . '" title="' . __('edit the template') . '" /> ' . $fname . '</a> ' . $special . '</li>';
         /*
                 if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
                     dcAuth::PERMISSION_CONTENT_ADMIN,
@@ -109,12 +109,12 @@ class templatorPager
 
         $res .= '<a class="media-remove" href="' .
         dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => $part, 'file' => $f->basename]) . '">' .
-        '<img src="' . dcPage::getPF('templator/img/copy.png') . '" alt="' . __('copy') . '" title="' . __('copy the template') . '" /></a>&nbsp;';
+        '<img src="images/plus.png" alt="' . __('copy') . '" title="' . __('copy the template') . '" /></a>&nbsp;';
 
         if ($f->del) {
             $res .= '<a class="media-remove" href="' .
             dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'delete', 'file' => $f->basename]) . '">' .
-            '<img src="' . dcPage::getPF('templator/img/delete.png') . '" alt="' . __('delete') . '" title="' . __('delete the template') . '" /></a>';
+            '<img src="images/trash.png" alt="' . __('delete') . '" title="' . __('delete the template') . '" /></a>';
         }
 
         $res .= '</li>';
