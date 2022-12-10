@@ -60,8 +60,8 @@ if (in_array($part, ['new', 'copycat'])) {
     }
 
     $combo_source = [
-        ' &mdash; ' => 'empty',
-        'post.html' => 'post',
+        __('Empty template') => 'empty',
+        'post.html'          => 'post',
     ];
 
     if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([dcPages::PERMISSION_PAGES]), dcCore::app()->blog->id) && dcCore::app()->plugins->moduleExists('pages')) {

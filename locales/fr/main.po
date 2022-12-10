@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: templator 1.4-dev\n"
+"Project-Id-Version: templator 1.4\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2022-12-07T20:57:29+00:00\n"
+"PO-Revision-Date: 2022-12-10T00:07:54+00:00\n"
 "Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -63,6 +63,9 @@ msgstr "supprimer le template"
 
 msgid "File already exists."
 msgstr "Le fichier existe déjà"
+
+msgid "Empty template"
+msgstr "Template vide"
 
 msgid "Filename is empty."
 msgstr "Le nom de fichier est vide."
