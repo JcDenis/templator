@@ -41,8 +41,8 @@ if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
     dcCore::app()->addBehavior('adminAfterPageCreate', ['templatorBehaviors','adminBeforePostUpdate']);
     dcCore::app()->addBehavior('adminBeforePageUpdate', ['templatorBehaviors','adminBeforePostUpdate']);
 
-    dcCore::app()->addBehavior('adminPostsActionsV2', ['templatorBehaviors','adminPostsActionsV2']);
-    dcCore::app()->addBehavior('adminPagesActionsV2', ['templatorBehaviors','adminPostsActionsV2']);
+    dcCore::app()->addBehavior('adminPostsActions', ['templatorBehaviors','adminPostsActions']);
+    dcCore::app()->addBehavior('adminPagesActions', ['templatorBehaviors','adminPostsActions']);
 
     dcCore::app()->addBehavior('adminFiltersListsV2', function (ArrayObject $sorts) {
         $sorts['templator'] = [
@@ -94,7 +94,7 @@ class templatorBehaviors
         }
     }
 
-    public static function adminPostsActionsV2(dcPostsActions $pa)
+    public static function adminPostsActions(dcPostsActions $pa)
     {
         $pa->addAction(
             [
