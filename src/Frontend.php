@@ -10,33 +10,69 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return null;
-}
+declare(strict_types=1);
 
-dcCore::app()->tpl->setPath(dcCore::app()->tpl->getPath(), dcCore::app()->templator->path);
-dcCore::app()->addBehavior('urlHandlerBeforeGetData', ['publicTemplatorBehaviors','BeforeGetData']);
+namespace Dotclear\Plugin\templator;
 
-class publicTemplatorBehaviors
+use dcCore;
+use dcNsProcess;
+use Dotclear\Database\MetaRecord;
+
+/**
+ * Frontend prepend.
+ */
+class Frontend extends dcNsProcess
 {
-    public static function BeforeGetData($_)
+    public static function init(): bool
     {
-        if (array_key_exists(dcCore::app()->url->type, dcCore::app()->getPostTypes()) || dcCore::app()->url->type == 'pages') {
-            $params              = [];
-            $params['meta_type'] = 'template';
-            $params['post_id']   = dcCore::app()->ctx->posts->post_id;
-            $post_meta           = dcCore::app()->meta->getMetadata($params);
+        static::$init = My::phpCompliant();
 
-            if (!$post_meta->isEmpty() && dcCore::app()->tpl->getFilePath($post_meta->meta_id)) {
-                dcCore::app()->ctx->current_tpl = $post_meta->meta_id;
-            }
+        return static::$init;
+    }
+
+    public static function process(): bool
+    {
+        if (!static::$init) {
+            return false;
         }
 
-        if (dcCore::app()->ctx->current_tpl == 'category.html' && preg_match('/^[0-9]{1,}/', dcCore::app()->ctx->categories->cat_id, $cat_id)) {
-            $tpl = 'category-' . $cat_id[0] . '.html';
-            if (dcCore::app()->tpl->getFilePath($tpl)) {
-                dcCore::app()->ctx->current_tpl = $tpl;
-            }
-        }
+        dcCore::app()->tpl->setPath(
+            dcCore::app()->tpl->getPath(),
+            Templator::instance()->getPath()
+        );
+
+        dcCore::app()->addBehaviors([
+            'urlHandlerBeforeGetData' => function ($_): void {
+                if (is_null(dcCore::app()->ctx)) {
+                    return;
+                }
+
+                if ((dcCore::app()->ctx->__get('posts') instanceof MetaRecord)
+                    && (array_key_exists(dcCore::app()->url->type, dcCore::app()->getPostTypes()) || dcCore::app()->url->type == 'pages')) {
+                    $params              = [];
+                    $params['meta_type'] = 'template';
+                    $params['post_id']   = dcCore::app()->ctx->__get('posts')->f('post_id');
+                    $post_meta           = dcCore::app()->meta->getMetadata($params);
+
+                    if (!$post_meta->isEmpty() && is_string($post_meta->f('meta_id')) && dcCore::app()->tpl->getFilePath($post_meta->f('meta_id'))) {
+                        dcCore::app()->ctx->__set('current_tpl', $post_meta->f('meta_id'));
+                    }
+                }
+
+                if (dcCore::app()->ctx->__get('current_tpl') == 'category.html'
+                    && (dcCore::app()->ctx->__get('categories') instanceof MetaRecord)
+                    && is_string(dcCore::app()->ctx->__get('categories')->f('cat_id'))
+                    && preg_match('/^[0-9]{1,}/', dcCore::app()->ctx->__get('categories')->f('cat_id'), $cat_id)
+                ) {
+                    $tpl = 'category-' . $cat_id[0] . '.html';
+                    if (dcCore::app()->tpl->getFilePath($tpl)) {
+                        dcCore::app()->ctx->__set('current_tpl', $tpl);
+                    }
+                }
+            },
+            'initWidgets' => [Widgets::class, 'initWidgets'],
+        ]);
+
+        return true;
     }
 }

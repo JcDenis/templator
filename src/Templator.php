@@ -10,55 +10,116 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return null;
-}
+declare(strict_types=1);
 
-class dcTemplator
+namespace Dotclear\Plugin\templator;
+
+use dcCore;
+use Dotclear\Helper\File\Files;
+use Dotclear\Helper\File\Path;
+use Dotclear\Helper\Html\Html;
+use Exception;
+
+/**
+ * Templator main class.
+ */
+class Templator
 {
-    protected $tpls_default_name     = 'dotty';
-    protected $post_default_name     = 'post.html';
-    protected $page_default_name     = 'page.html';
-    protected $category_default_name = 'category.html';
+    /** @var    string  This plugin folder for templates */
+    public const MY_TPL_DIR = 'other-templates';
 
-    public $template_dir_name = 'other-templates';
-    public $path;
+    /** @var    string  The dotclear folder for templates */
+    public const DC_TPL_DIR = 'default-templates';
 
-    public $tpl       = [];
-    public $theme_tpl = [];
+    /** @var    string  The themes folder for templates */
+    public const THEME_TPL_DIR = 'tpl';
+
+    /** @var    string  The default tplset */
+    public const DEFAULT_TPLSET = 'dotty';
+
+    /** @var    string  The default post template */
+    public const DEFAULT_TPL_POST = 'post.html';
+
+    /** @var    string   The default page template */
+    public const DEFAULT_TPL_PAGE = 'page.html';
+
+    /** @var    string  The default category tempalte */
+    public const DEFAULT_TPL_CATEGORY = 'category.html';
+
+    /** @var    Templator    Self instance */
+    private static $instance;
+
+    /** @var    string  $path   This plugin templates directory path */
+    private string $path = '';
+
+    /** @var    array<string,string>    The known templates files */
+    private array $tpl = [];
+
+    private string $file_tpl_post     = '';
+    private string $file_tpl_page     = '';
+    private string $file_tpl_category = '';
+
+    private string $user_path_theme   = '';
+    private string $user_tpl_post     = '';
+    private string $user_tpl_category = '';
+    private string $user_tpl_page     = '';
 
     /**
-     *
+     * Constructor sets properties.
      */
     public function __construct()
     {
-        $this->path = dcCore::app()->blog->public_path . '/' . $this->template_dir_name;
-
-        // Initial templates
-        $this->post_tpl     = DC_ROOT . '/inc/public/default-templates/' . $this->tpls_default_name . '/' . $this->post_default_name;
-        $this->category_tpl = DC_ROOT . '/inc/public/default-templates/' . $this->tpls_default_name . '/' . $this->category_default_name;
-
-        if (dcCore::app()->plugins->moduleExists('pages')) {
-            $plugin_page    = dcCore::app()->plugins->getModules('pages');
-            $this->page_tpl = path::real($plugin_page['root'] . '/default-templates/' . $this->tpls_default_name . '/' . $this->page_default_name);
+        if (is_null(dcCore::app()->blog)) {
+            throw new Exception(__('Blog is not set'));
         }
 
-        $this->user_theme        = dcCore::app()->blog->themes_path . '/' . dcCore::app()->blog->settings->system->theme;
-        $this->user_post_tpl     = path::real($this->user_theme . '/tpl/' . $this->post_default_name);
-        $this->user_category_tpl = path::real($this->user_theme . '/tpl/' . $this->category_default_name);
-        $this->user_page_tpl     = path::real($this->user_theme . '/tpl/' . $this->page_default_name);
+        $page_root = dcCore::app()->plugins->getDefine('pages')->get('root');
+
+        // Initial templates
+        $this->path              = implode(DIRECTORY_SEPARATOR, [dcCore::app()->blog->public_path, self::MY_TPL_DIR]);
+        $this->file_tpl_post     = implode(DIRECTORY_SEPARATOR, [DC_ROOT, 'inc', 'public', self::DC_TPL_DIR, self::DEFAULT_TPLSET, self::DEFAULT_TPL_POST]);
+        $this->file_tpl_category = implode(DIRECTORY_SEPARATOR, [DC_ROOT, 'inc', 'public', self::DC_TPL_DIR, self::DEFAULT_TPLSET, self::DEFAULT_TPL_CATEGORY]);
+        $this->file_tpl_page     = Path::real(implode(DIRECTORY_SEPARATOR, [$page_root, self::DC_TPL_DIR, self::DEFAULT_TPLSET, self::DEFAULT_TPL_PAGE])) ?: '';
+
+        // user templates
+        $this->user_path_theme   = dcCore::app()->blog->themes_path . DIRECTORY_SEPARATOR . dcCore::app()->blog->settings->get('system')->get('theme');
+        $this->user_tpl_post     = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_POST])) ?: '';
+        $this->user_tpl_category = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_CATEGORY])) ?: '';
+        $this->user_tpl_page     = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_PAGE])) ?: '';
 
         $this->findTemplates();
+    }
+
+    public static function instance(): Templator
+    {
+        if (!(self::$instance instanceof Templator)) {
+            self::$instance = new Templator();
+        }
+
+        return self::$instance;
+    }
+
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    public function getTpl(): array
+    {
+        return $this->tpl;
     }
 
     /**
      *
      */
-    public function canUseRessources($create = false)
+    public function canUseRessources(bool $create = false): bool
     {
         if (!is_dir($this->path)) {
             if ($create) {
-                files::makeDir($this->path);
+                Files::makeDir($this->path);
             }
 
             return true;
@@ -80,9 +141,9 @@ class dcTemplator
     }
 
     /**
-     *
+     * @return  array{c: string, w: bool, f: string}
      */
-    public function getSourceContent($f)
+    public function getSourceContent(string $f): array
     {
         $source = $this->tpl;
 
@@ -96,8 +157,8 @@ class dcTemplator
         }
 
         return [
-            'c' => file_get_contents($source[$f]),
-            'w' => $this->getDestinationFile($f) !== false,
+            'c' => (string) file_get_contents($source[$f]),
+            'w' => !empty($this->getDestinationFile($f)),
             'f' => $f,
         ];
     }
@@ -105,7 +166,7 @@ class dcTemplator
     /**
      *
      */
-    public function filesList($item = '%1$s')
+    public function filesList(string $item = '%1$s'): string
     {
         $files = $this->tpl;
 
@@ -117,7 +178,7 @@ class dcTemplator
         foreach ($files as $k => $v) {
             $li = sprintf('<li>%s</li>', $item);
 
-            $list .= sprintf($li, $k, html::escapeHTML($k));
+            $list .= sprintf($li, $k, Html::escapeHTML($k));
         }
 
         return sprintf('<ul>%s</ul>', $list);
@@ -126,31 +187,31 @@ class dcTemplator
     /**
      *
      */
-    public function initializeTpl($name, $type)
+    public function initializeTpl(string $name, string $type): void
     {
         if ($type == 'category') {
-            if ($this->user_category_tpl) {
-                $base = $this->user_category_tpl;
+            if ($this->user_tpl_category) {
+                $base = $this->user_tpl_category;
             } else {
-                $base = $this->category_tpl;
+                $base = $this->file_tpl_category;
             }
         } elseif ($type == 'page') {
-            if ($this->user_page_tpl) {
-                $base = $this->user_page_tpl;
+            if ($this->user_tpl_page) {
+                $base = $this->user_tpl_page;
             } else {
-                $base = $this->page_tpl;
+                $base = $this->file_tpl_page;
             }
         } else {
-            if ($this->user_post_tpl) {
-                $base = $this->user_post_tpl;
+            if ($this->user_tpl_post) {
+                $base = $this->user_tpl_post;
             } else {
-                $base = $this->post_tpl;
+                $base = $this->file_tpl_post;
             }
         }
 
         $source = [
-            'c' => file_get_contents($base),
-            'w' => $this->getDestinationFile($name) !== false,
+            'c' => (string) file_get_contents($base),
+            'w' => !empty($this->getDestinationFile($name)),
         ];
 
         if (!$source['w']) {
@@ -171,7 +232,7 @@ class dcTemplator
             $content = $source['c'];
 
             if (!is_dir(dirname($dest))) {
-                files::makeDir(dirname($dest));
+                Files::makeDir(dirname($dest));
             }
 
             $fp = @fopen($dest, 'wb');
@@ -179,8 +240,8 @@ class dcTemplator
                 throw new Exception('tocatch');
             }
 
-            $content = preg_replace('/(\r?\n)/m', "\n", $content);
-            $content = preg_replace('/\r/m', "\n", $content);
+            $content = (string) preg_replace('/(\r?\n)/m', "\n", $content);
+            $content = (string) preg_replace('/\r/m', "\n", $content);
 
             fwrite($fp, $content);
             fclose($fp);
@@ -192,7 +253,7 @@ class dcTemplator
     /**
      *
      */
-    public function copypasteTpl($name, $source)
+    public function copypasteTpl(string $name, string $source): void
     {
         if ($name == $source) {
             throw new Exception(__('File already exists.'));
@@ -202,7 +263,7 @@ class dcTemplator
 
         $data = [
             'c' => $file['c'],
-            'w' => $this->getDestinationFile($name) !== false,
+            'w' => !empty($this->getDestinationFile($name)),
         ];
 
         if (!$data['w']) {
@@ -219,7 +280,7 @@ class dcTemplator
             $content = $data['c'];
 
             if (!is_dir(dirname($dest))) {
-                files::makeDir(dirname($dest));
+                Files::makeDir(dirname($dest));
             }
 
             $fp = @fopen($dest, 'wb');
@@ -227,8 +288,8 @@ class dcTemplator
                 throw new Exception('tocatch');
             }
 
-            $content = preg_replace('/(\r?\n)/m', "\n", $content);
-            $content = preg_replace('/\r/m', "\n", $content);
+            $content = (string) preg_replace('/(\r?\n)/m', "\n", $content);
+            $content = (string) preg_replace('/\r/m', "\n", $content);
 
             fwrite($fp, $content);
             fclose($fp);
@@ -240,7 +301,7 @@ class dcTemplator
     /**
      *
      */
-    public function writeTpl($name, $content)
+    public function writeTpl(string $name, string $content): void
     {
         try {
             $dest = $this->getDestinationFile($name);
@@ -250,16 +311,17 @@ class dcTemplator
             }
 
             if (!is_dir(dirname($dest))) {
-                files::makeDir(dirname($dest));
+                Files::makeDir(dirname($dest));
             }
 
             $fp = @fopen($dest, 'wb');
             if (!$fp) {
                 //throw new Exception('tocatch');
+                return;
             }
 
-            $content = preg_replace('/(\r?\n)/m', "\n", $content);
-            $content = preg_replace('/\r/m', "\n", $content);
+            $content = (string) preg_replace('/(\r?\n)/m', "\n", $content);
+            $content = (string) preg_replace('/\r/m', "\n", $content);
 
             fwrite($fp, $content);
             fclose($fp);
@@ -271,7 +333,7 @@ class dcTemplator
     /**
      *
      */
-    public function copyTpl($name)
+    public function copyTpl(string $name): void
     {
         try {
             $file = $this->getSourceContent($name);
@@ -282,7 +344,7 @@ class dcTemplator
             }
 
             if (!is_dir(dirname($dest))) {
-                files::makeDir(dirname($dest));
+                Files::makeDir(dirname($dest));
             }
 
             $fp = @fopen($dest, 'wb');
@@ -290,7 +352,7 @@ class dcTemplator
                 throw new Exception('tocatch');
             }
 
-            $content = preg_replace('/(\r?\n)/m', "\n", $file['c']);
+            $content = (string) preg_replace('/(\r?\n)/m', "\n", $file['c']);
             $content = preg_replace('/\r/m', "\n", $file['c']);
 
             fwrite($fp, $file['c']);
@@ -300,11 +362,14 @@ class dcTemplator
         }
     }
 
-    protected function getDestinationFile($f, $totheme = false)
+    /**
+     * @return  string  The destination or empty string on error
+     */
+    protected function getDestinationFile(string $f, bool $totheme = false): string
     {
         $dest = $this->path . '/' . $f;
         if ($totheme) {
-            $dest = $this->user_theme . '/tpl/' . $f;
+            $dest = implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, $f]);
         }
 
         if (file_exists($dest) && is_writable($dest)) {
@@ -315,27 +380,31 @@ class dcTemplator
             return $dest;
         }
 
-        return false;
+        return '';
     }
 
-    protected function findTemplates()
+    protected function findTemplates(): void
     {
         $this->tpl = $this->getFilesInDir($this->path);
-        //$this->theme_tpl = $this->getFilesInDir(path::real($this->user_theme).'/tpl');
 
         uksort($this->tpl, [$this,'sortFilesHelper']);
-        //uksort($this->theme_tpl,array($this,'sortFilesHelper'));
     }
 
-    protected function getFilesInDir($dir)
+    /**
+     * @return array<string,string>
+     */
+    protected function getFilesInDir(string $dir): array
     {
-        $dir = path::real($dir);
+        $res = [];
+        $dir = Path::real($dir);
         if (!$dir || !is_dir($dir) || !is_readable($dir)) {
-            return [];
+            return $res;
         }
 
-        $d   = dir($dir);
-        $res = [];
+        $d = dir($dir);
+        if (!$d) {
+            return $res;
+        }
         while (($f = $d->read()) !== false) {
             if (is_file($dir . '/' . $f) && !preg_match('/^\./', $f)) {
                 $res[$f] = $dir . '/' . $f;
@@ -345,14 +414,14 @@ class dcTemplator
         return $res;
     }
 
-    protected function sortFilesHelper($a, $b)
+    protected function sortFilesHelper(string $a, string $b): int
     {
         if ($a == $b) {
             return 0;
         }
 
-        $ext_a = files::getExtension($a);
-        $ext_b = files::getExtension($b);
+        $ext_a = Files::getExtension($a);
+        $ext_b = Files::getExtension($b);
 
         return strcmp($ext_a . '.' . $a, $ext_b . '.' . $b);
     }

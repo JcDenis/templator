@@ -10,161 +10,71 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_CONTEXT_ADMIN')) {
-    return null;
-}
+declare(strict_types=1);
 
-dcCore::app()->auth->setPermissionType(initTemplator::PERMISSION_TEMPLATOR, __('manage templates'));
+namespace Dotclear\Plugin\templator;
 
-dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
-    __('Templates engine'),
-    dcCore::app()->adminurl->get('admin.plugin.templator'),
-    urldecode(dcPage::getPF('templator/icon.png')),
-    preg_match('/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.templator')) . '(&.*)?$/', $_SERVER['REQUEST_URI']),
-    dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-        dcAuth::PERMISSION_CONTENT_ADMIN,
-        initTemplator::PERMISSION_TEMPLATOR,
-    ]), dcCore::app()->blog->id)
-);
+use dcAdmin;
+use dcCore;
+use dcMenu;
+use dcNsProcess;
+use dcPage;
 
-if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-    dcAuth::PERMISSION_CONTENT_ADMIN,
-    initTemplator::PERMISSION_TEMPLATOR,
-]), dcCore::app()->blog->id)) {
-    dcCore::app()->addBehavior('adminPostHeaders', ['templatorBehaviors','adminPostHeaders']);
-    dcCore::app()->addBehavior('adminPostFormItems', ['templatorBehaviors','adminPostFormItems']);
-    dcCore::app()->addBehavior('adminPageHeaders', ['templatorBehaviors','adminPostHeaders']);
-    dcCore::app()->addBehavior('adminPageFormItems', ['templatorBehaviors','adminPostFormItems']);
-
-    dcCore::app()->addBehavior('adminAfterPostCreate', ['templatorBehaviors','adminBeforePostUpdate']);
-    dcCore::app()->addBehavior('adminBeforePostUpdate', ['templatorBehaviors','adminBeforePostUpdate']);
-    dcCore::app()->addBehavior('adminAfterPageCreate', ['templatorBehaviors','adminBeforePostUpdate']);
-    dcCore::app()->addBehavior('adminBeforePageUpdate', ['templatorBehaviors','adminBeforePostUpdate']);
-
-    dcCore::app()->addBehavior('adminPostsActions', ['templatorBehaviors','adminPostsActions']);
-    dcCore::app()->addBehavior('adminPagesActions', ['templatorBehaviors','adminPostsActions']);
-
-    dcCore::app()->addBehavior('adminFiltersListsV2', function (ArrayObject $sorts) {
-        $sorts['templator'] = [
-            __('Templates engine'),
-            [
-                __('Date')     => 'post_upddt',
-                __('Title')    => 'post_title',
-                __('Category') => 'cat_id',
-            ],
-            'post_upddt',
-            'desc',
-            [__('Entries per page'), 30],
-        ];
-    });
-}
-
-class templatorBehaviors
+class Backend extends dcNsProcess
 {
-    public static function adminPostHeaders()
+    public static function init(): bool
     {
-        return dcPage::jsLoad(dcPage::getPF('templator/js/admin.js'));
+        static::$init == defined('DC_CONTEXT_ADMIN')
+            && My::phpCompliant()
+            && !is_null(dcCore::app()->blog) && !is_null(dcCore::app()->auth)
+            && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
+                My::PERMISSION_TEMPLATOR,
+                dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
+            ]), dcCore::app()->blog->id);
+
+        return static::$init;
     }
 
-    public static function adminPostFormItems(ArrayObject $main_items, ArrayObject $sidebar_items, $post)
+    public static function process(): bool
     {
-        $selected = '';
-
-        if ($post) {
-            $post_meta = dcCore::app()->meta->getMetadata(['meta_type' => 'template', 'post_id' => $post->post_id]);
-            $selected  = $post_meta->isEmpty() ? '' : $post_meta->meta_id;
+        if (!static::$init) {
+            return false;
         }
 
-        $sidebar_items['options-box']['items']['templator'] = '<div id="templator">' .
-            '<h5>' . __('Template') . '</h5>' .
-            '<p><label for="post_tpl">' . __('Select template:') . '</label>' .
-            form::combo('post_tpl', self::getTemplateCombo(), $selected) . '</p>' .
-            '</div>';
-    }
-
-    public static function adminBeforePostUpdate($cur, $post_id)
-    {
-        $post_id = (int) $post_id;
-
-        if (isset($_POST['post_tpl'])) {
-            dcCore::app()->meta->delPostMeta($post_id, 'template');
-            if (!empty($_POST['post_tpl'])) {
-                dcCore::app()->meta->setPostMeta($post_id, 'template', $_POST['post_tpl']);
-            }
-        }
-    }
-
-    public static function adminPostsActions(dcPostsActions $pa)
-    {
-        $pa->addAction(
-            [
-                __('Appearance') => [
-                    __('Select the template') => 'tpl',
-                ],
-            ],
-            ['templatorBehaviors', 'adminPostsActionsCallback']
-        );
-    }
-
-    public static function adminPostsActionsCallback(dcPostsActions $pa, ArrayObject $post)
-    {
-        # No entry
-        $posts_ids = $pa->getIDs();
-        if (empty($posts_ids)) {
-            throw new Exception(__('No entry selected'));
+        // nullsafe
+        if (is_null(dcCore::app()->auth) || is_null(dcCore::app()->blog) || is_null(dcCore::app()->adminurl)) {
+            return false;
         }
 
-        if (isset($post['post_tpl'])) {
-            try {
-                foreach ($posts_ids as $post_id) {
-                    dcCore::app()->meta->delPostMeta($post_id, 'template');
-                    if (!empty($post['post_tpl'])) {
-                        dcCore::app()->meta->setPostMeta($post_id, 'template', $post['post_tpl']);
-                    }
-                }
-
-                dcAdminNotices::addSuccessNotice(__('Entries template updated.'));
-                $pa->redirect(true);
-            } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
-            }
+        //backend sidebar menu icon
+        if ((dcCore::app()->menu[dcAdmin::MENU_PLUGINS] instanceof dcMenu)) {
+            dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
+                My::name(),
+                dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                urldecode(dcPage::getPF(My::id() . '/icon.png')),
+                preg_match('/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.' . My::id())) . '(&.*)?$/', $_SERVER['REQUEST_URI']),
+                dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
+                    dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
+                    My::PERMISSION_TEMPLATOR,
+                ]), dcCore::app()->blog->id)
+            );
         }
 
-        $pa->beginPage(
-            dcPage::breadcrumb([
-                html::escapeHTML(dcCore::app()->blog->name) => '',
-                $pa->getCallerTitle()                       => $pa->getRedirection(true),
-                __('Entry template')                        => '',
-            ])
-        );
+        dcCore::app()->addBehaviors([
+            'adminPostHeaders'      => [BackendBehaviors::class,'adminPostHeaders'],
+            'adminPostFormItems'    => [BackendBehaviors::class,'adminPostFormItems'],
+            'adminPageHeaders'      => [BackendBehaviors::class,'adminPostHeaders'],
+            'adminPageFormItems'    => [BackendBehaviors::class,'adminPostFormItems'],
+            'adminAfterPostCreate'  => [BackendBehaviors::class,'adminBeforePostUpdate'],
+            'adminBeforePostUpdate' => [BackendBehaviors::class,'adminBeforePostUpdate'],
+            'adminAfterPageCreate'  => [BackendBehaviors::class,'adminBeforePostUpdate'],
+            'adminBeforePageUpdate' => [BackendBehaviors::class,'adminBeforePostUpdate'],
+            'adminPostsActions'     => [BackendBehaviors::class,'adminPostsActions'],
+            'adminPagesActions'     => [BackendBehaviors::class,'adminPostsActions'],
+            'adminFiltersListsV2'   => [BackendBehaviors::class, 'adminFiltersListsV2'],
+            'initWidgets'           => [Widgets::class, 'initWidgets'],
+        ]);
 
-        echo
-        '<h2 class="page-title">' . __('Select template for the selection') . '</h2>' .
-        '<form action="' . $pa->getURI() . '" method="post">' .
-        $pa->getCheckboxes() .
-        '<p><label class="classic">' . __('Select template:') . '</label> ' .
-        form::combo('post_tpl', self::getTemplateCombo()) . '</p>' .
-
-        '<p>' .
-        $pa->getHiddenFields() .
-        dcCore::app()->formNonce() .
-        form::hidden(['action'], 'tpl') .
-        '<input type="submit" value="' . __('Save') . '" /></p>' .
-        '</form>';
-
-        $pa->endPage();
-    }
-
-    private static function getTemplateCombo()
-    {
-        $tpl = [__('No specific template') => ''];
-
-        foreach (dcCore::app()->templator->tpl as $k => $v) {
-            if (!preg_match('/^category-(.+)$/', $k) && !preg_match('/^list-(.+)$/', $k)) {
-                $tpl[$k] = $k;
-            }
-        }
-
-        return $tpl;
+        return true;
     }
 }

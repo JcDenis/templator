@@ -10,14 +10,24 @@
  * @copyright Jean-Christian Denis
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-if (!defined('DC_RC_PATH')) {
-    return;
-}
+declare(strict_types=1);
 
-class templatorPager
+namespace Dotclear\Plugin\templator;
+
+use dcCore;
+use dcPage;
+use Dotclear\Helper\File\File;
+use Dotclear\Helper\File\Files;
+use Exception;
+
+class Pager
 {
-    public static function templatorItemLine($f, $i)
+    public static function line(File $f, int $i): string
     {
+        if (is_null(dcCore::app()->blog) || is_null(dcCore::app()->adminurl)) {
+            return '';
+        }
+
         $p_url       = dcCore::app()->admin->getPageURL();
         $fname       = $f->basename;
         $count       = '';
@@ -36,9 +46,9 @@ class templatorPager
             $full_name   = '';
             $cat_parents = dcCore::app()->blog->getCategoryParents($cat_id);
             while ($cat_parents->fetch()) {
-                $full_name = $cat_parents->cat_title . ' &rsaquo; ';
+                $full_name = $cat_parents->f('cat_title') . ' &rsaquo; ';
             };
-            $fname               = '<strong>' . __('Category') . '</strong> :&nbsp;' . $full_name . dcCore::app()->blog->getCategory($cat_id)->cat_title;
+            $fname               = '<strong>' . __('Category') . '</strong> :&nbsp;' . $full_name . $category->f('cat_title');
             $params['cat_id']    = $cat_id;
             $params['post_type'] = '';
             $icon                = dcPage::getPF('templator/img/template-alt.png');
@@ -66,18 +76,19 @@ class templatorPager
             $params['post_type'] = '';
 
             try {
-                $counter = dcCore::app()->meta->getPostsByMeta($params, true);
+                $counter = dcCore::app()->meta->getPostsByMeta($params, true)?->f(0);
+                $counter = is_numeric($counter) ? (int) $counter : 0;
                 $url     = dcCore::app()->adminurl->get('admin.plugin.templator', [
                     'part'  => 'posts',
                     'file'  => $fname,
                     'redir' => dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'files']),
                 ]);
-                if ($counter->f(0) == 0) {
+                if ($counter == 0) {
                     $count = __('No entry');
-                } elseif ($counter->f(0) == 1) {
-                    $count = '<strong>' . $counter->f(0) . '</strong> <a href="' . $url . '">' . __('entry') . '</a>';
+                } elseif ($counter == 1) {
+                    $count = '<strong>' . $counter . '</strong> <a href="' . $url . '">' . __('entry') . '</a>';
                 } else {
-                    $count = '<strong>' . $counter->f(0) . '</strong> <a href="' . $url . '">' . __('entries') . '</a>';
+                    $count = '<strong>' . $counter . '</strong> <a href="' . $url . '">' . __('entries') . '</a>';
                 }
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
@@ -100,7 +111,7 @@ class templatorPager
             $res .= '<li>' . $count . '</li>' .
             '<li>' .
             $f->media_dtstr . ' - ' .
-            files::size($f->size) .
+            Files::size($f->size) .
             $details .
             '</li>';
         }
