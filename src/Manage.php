@@ -164,8 +164,8 @@ class Manage extends dcNsProcess
             dcPage::openModule(My::name());
             echo
             dcPage::breadcrumb([
-                __('Plugins')          => '',
-                My::name() => dcCore::app()->adminurl->get('admin.plugin.' . My::id())
+                __('Plugins') => '',
+                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
             ]) .
             dcPage::notices();
 
@@ -176,9 +176,9 @@ class Manage extends dcNsProcess
             dcPage::openModule(My::name());
             echo
             dcPage::breadcrumb([
-                __('Plugins')          => '',
-                My::name() => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-                $v->name     => '',
+                __('Plugins') => '',
+                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                $v->name      => '',
             ]) .
             dcPage::notices() .
 
@@ -210,9 +210,9 @@ class Manage extends dcNsProcess
             dcPage::openModule(My::name());
             echo
             dcPage::breadcrumb([
-                __('Plugins')                 => '',
-                My::name()        => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-                $v->name => '',
+                __('Plugins') => '',
+                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                $v->name      => '',
             ]) .
             dcPage::notices() .
 
@@ -246,9 +246,9 @@ class Manage extends dcNsProcess
             dcPage::openModule(My::name());
             echo
             dcPage::breadcrumb([
-                __('Plugins')                 => '',
-                My::name()        => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-                $v->name => '',
+                __('Plugins') => '',
+                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                $v->name      => '',
             ]) .
             dcPage::notices() .
 
@@ -274,9 +274,9 @@ class Manage extends dcNsProcess
             dcPage::openModule(My::name());
             echo
             dcPage::breadcrumb([
-                __('Plugins')                   => '',
-                My::name()          => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-                $v->name => '',
+                __('Plugins') => '',
+                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                $v->name      => '',
             ]) .
             dcPage::notices() .
 
@@ -299,9 +299,9 @@ class Manage extends dcNsProcess
             dcPage::openModule(My::name());
             echo
             dcPage::breadcrumb([
-                __('Plugins')             => '',
+                __('Plugins') => '',
                 My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-                $v->name => '',
+                $v->name      => '',
             ]) .
             dcPage::notices() .
             '<h3>' . $v->name . '</h3>';
@@ -383,9 +383,9 @@ class Manage extends dcNsProcess
             );
             echo
             dcPage::breadcrumb([
-                __('Plugins')          => '',
-                My::name() => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-                $v->name   => '',
+                __('Plugins') => '',
+                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                $v->name      => '',
             ]) .
             dcPage::notices() .
             '<h3>' . $v->name . '</h3>';
@@ -436,12 +436,13 @@ class Manage extends dcNsProcess
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
             }
-            
+
             $ict = dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax_theme');
 
             dcPage::openModule(
                 My::name(),
-                (dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax') ?
+                (
+                    dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax') ?
                     dcPage::jsJson('dotclear_colorsyntax', ['colorsyntax' => dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax')]) : ''
                 ) .
                 dcPage::jsJson('theme_editor_msg', [
@@ -452,7 +453,8 @@ class Manage extends dcNsProcess
                 ]) .
                 dcPage::jsModuleLoad('themeEditor/js/script.js') .
                 dcPage::jsConfirmClose('file-form') .
-                (dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax') ?
+                (
+                    dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax') ?
                     dcPage::jsLoadCodeMirror(is_string($ict) ? $ict : '') : ''
                 ) .
                 dcPage::cssModuleLoad('themeEditor/style.css')
@@ -460,9 +462,9 @@ class Manage extends dcNsProcess
 
             echo
             dcPage::breadcrumb([
-                __('Plugins')          => '',
-                My::name() => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-                $v->name    => '',
+                __('Plugins') => '',
+                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                $v->name      => '',
             ]) .
             dcPage::notices();
 
@@ -551,9 +553,9 @@ class Manage extends dcNsProcess
 
             echo
             dcPage::breadcrumb([
-                __('Plugins')           => '',
-                My::name()  => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-                $v->name => '',
+                __('Plugins') => '',
+                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                $v->name      => '',
             ]) .
             dcPage::notices() .
 
@@ -601,14 +603,14 @@ class Manage extends dcNsProcess
             dcPage::openModule(My::name());
             echo
             dcPage::breadcrumb([
-                __('Plugins')          => '',
-                My::id() => '',
+                __('Plugins') => '',
+                My::name()    => '',
             ]) .
             dcPage::notices();
 
             $line = '<li><a href="%s">%s</a></li>';
             echo '
-            <h4><i>' . __('Manage additional templates') . '</i></h4>' .
+            <h4><i>' . __('Create and select more templates for your posts') . '</i></h4>' .
             sprintf(
                 '<h3><ul class="nice">%s</ul></h3>',
                 sprintf(
