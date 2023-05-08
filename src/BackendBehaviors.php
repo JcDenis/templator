@@ -68,7 +68,7 @@ class BackendBehaviors
                     __('Select the template') => 'tpl',
                 ],
             ],
-            ['templatorBehaviors', 'adminPostsActionsCallback']
+            [self::class, 'adminPostsActionsCallback']
         );
     }
 
@@ -125,7 +125,7 @@ class BackendBehaviors
 
     public static function adminFiltersListsV2(ArrayObject $sorts): void
     {
-        $sorts['templator'] = [
+        $sorts[My::id()] = [
             __('Templates engine'),
             [
                 __('Date')     => 'post_upddt',
