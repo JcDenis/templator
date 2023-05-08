@@ -18,9 +18,9 @@ $this->registerModule(
     'Templates engine',
     'Create and select more templates for your posts',
     'Osku and contributors',
-    '1.4',
+    '1.5',
     [
-        'requires'    => [['core', '2.24']],
+        'requires'    => [['core', '2.26']],
         'permissions' => dcCore::app()->auth->makePermissions([
             dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
             initTemplator::PERMISSION_TEMPLATOR,

@@ -1,171 +1,242 @@
+# Language: Français
+# Module: templator - 1.5
+# Date: 2023-05-08 23:32:20
+# Author: Jean-Christian Denis
+# Translated with translater 2023.04.23
+
 msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
-"Project-Id-Version: templator 1.4\n"
+"Project-Id-Version: templator 1.5\n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2022-12-10T00:18:25+00:00\n"
+"PO-Revision-Date: 2023-05-08T23:32:20+00:00\n"
 "Last-Translator: Jean-Christian Denis\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-msgid "manage templates"
-msgstr "gérer les templates"
-
-msgid "Templates engine"
-msgstr "Moteur de templates"
-
-msgid "Entries per page"
-msgstr "Entrées par page"
-
+#: src/BackendBehaviors.php:46
 msgid "Select template:"
 msgstr "Sélectionner le template :"
 
+#: src/BackendBehaviors.php:67
 msgid "Appearance"
 msgstr "Aspect"
 
+#: src/BackendBehaviors.php:68
 msgid "Select the template"
 msgstr "Sélectionner le template"
 
+#: src/BackendBehaviors.php:94
 msgid "Entries template updated."
 msgstr "Templates de billets mis à jour"
 
+#: src/BackendBehaviors.php:105
 msgid "Entry template"
 msgstr "Template de billet"
 
+#: src/BackendBehaviors.php:110
 msgid "Select template for the selection"
 msgstr "Sélectionner le template pour la sélection :"
 
+#: src/BackendBehaviors.php:129
+msgid "Templates engine"
+msgstr "Moteur de templates"
+
+#: src/BackendBehaviors.php:137
+msgid "Entries per page"
+msgstr "Entrées par page"
+
+#: src/BackendBehaviors.php:146
 msgid "No specific template"
 msgstr "Aucun template additionnel"
 
-msgid "Templator › Rendering"
-msgstr "Templator › Rendu"
-
-msgid "Template:"
-msgstr "Template&nbsp;:"
-
-msgid "Template widget"
-msgstr "Template widget"
-
-msgid "edit the template"
-msgstr "modifier le template"
-
-msgid "details"
-msgstr "détails"
-
-msgid "copy"
-msgstr "copier"
-
-msgid "copy the template"
-msgstr "copier le template"
-
-msgid "delete the template"
-msgstr "supprimer le template"
-
-msgid "File already exists."
-msgstr "Le fichier existe déjà"
-
-msgid "Empty template"
-msgstr "Template vide"
-
+#: src/Manage.php:71
 msgid "Filename is empty."
 msgstr "Le nom de fichier est vide."
 
+#: src/Manage.php:76
 msgid "The new template has been successfully created."
 msgstr "Un noueau template a été créé avec succès."
 
+#: src/Manage.php:95
 msgid "The template has been successfully copied."
 msgstr "Le template a été copié avec succès."
 
+#: src/Manage.php:132
 msgid "The template has been successfully removed."
 msgstr "Le template a été supprimé avec succès."
 
+#: src/Manage.php:163
 msgid "The plugin is unusable with your configuration. You have to change file permissions."
 msgstr "L'extension est inutilisable avec votre configuration. Vous devez modifier les permissions des fichiers."
 
-msgid "Templator"
-msgstr "Templator"
-
-msgid "New template"
-msgstr "Nouveau template"
-
+#: src/Manage.php:187
 msgid "Template source:"
 msgstr "Template source :"
 
+#: src/Manage.php:189
 msgid "Filename:"
 msgstr "Nom de fichier :"
 
+#: src/Manage.php:191
 msgid "Extension .html is automatically added to filename."
 msgstr "L'extension .html est automatiquement ajouté au nom de fichier."
 
+#: src/Manage.php:197
 msgid "Required only for category template."
 msgstr "Requis uniquement pour un template de catégorie"
 
-msgid "Copy available template"
-msgstr "Copier un template disponible"
-
+#: src/Manage.php:221
 msgid "New filename:"
 msgstr "Nouveau nom de fichier :"
 
+#: src/Manage.php:224
 msgid "To copy the template <strong>%s</strong>, you need to fill a new filename."
 msgstr "Pour copier le template <strong>%s</strong>, il est nécessaire de renseigner un nom de fichier."
 
+#: src/Manage.php:228
 msgid "Copy"
 msgstr "Copier"
 
+#: src/Manage.php:257
 msgid "Target category:"
 msgstr "Catégorie cible :"
 
+#: src/Manage.php:260
 msgid "To copy the template <strong>%s</strong> (%s), you need to choose a category."
 msgstr "Pour copier le template  <strong>%s</strong> (%s), il est nécessaire de choisir une catégorie."
 
-msgid "Delete available template"
-msgstr "Effacer un template disponible"
-
+#: src/Manage.php:286
 msgid "Are you sure you want to remove the template \"%s\"?"
 msgstr "Êtes-vous sûr(e) de vouloir supprimer le template \"%s\" ?"
 
-msgid "Available templates"
-msgstr "Templates disponibles"
-
+#: src/Manage.php:310
 msgid "No template."
 msgstr "Aucun template."
 
+#: src/Manage.php:359
 msgid "available template"
 msgstr "template disponible"
 
+#: src/Manage.php:361
 msgid "missing template"
 msgstr "template manquant"
 
-msgid "Used templates"
-msgstr "Templates utilisés"
-
+#: src/Manage.php:401
 msgid "No specific templates on this blog."
 msgstr "Aucun template spécifique sur ce blog."
 
-msgid "Edit template"
-msgstr "Modifier un template"
-
+#: src/Manage.php:487
 msgid "This file is not writable. Please check your files permissions."
 msgstr "Ce fichier ne peut pas être modifié. Veuillez vérifier les permissions des fichiers."
 
-msgid "Unselect template"
-msgstr "Désélectionner un template"
+#: src/Manage.php:536
+msgid "Failed to get posts meta"
+msgstr "impossible de retrouver les métadonnées"
 
+#: src/Manage.php:560
 msgid "Unselect template \"%s\""
 msgstr "Désélectionner le template \"%s\""
 
+#: src/Manage.php:565
 msgid "There is no entries"
 msgstr "Il n'y a pas de billet"
 
+#: src/Manage.php:585
 msgid "Unselect template for selected entries"
 msgstr "Désélectionner ce template pour la sélection de billets"
 
 msgid "Manage additional templates"
 msgstr "Gérer les templates additionnels"
 
+#: src/Manage.php:617
+#: src/ManageVars.php:139
+msgid "Available templates"
+msgstr "Templates disponibles"
+
+#: src/Manage.php:622
+#: src/ManageVars.php:140
+msgid "Used templates"
+msgstr "Templates utilisés"
+
+#: src/Manage.php:627
+#: src/ManageVars.php:135
+msgid "New template"
+msgstr "Nouveau template"
+
+#: src/ManageVars.php:102
+msgid "Empty template"
+msgstr "Template vide"
+
+#: src/ManageVars.php:136
+msgid "Copy available template"
+msgstr "Copier un template disponible"
+
+#: src/ManageVars.php:137
+msgid "Copy available category template"
+msgstr "Copier un template disponible de catégorie"
+
+#: src/ManageVars.php:138
+msgid "Delete available template"
+msgstr "Effacer un template disponible"
+
+#: src/ManageVars.php:141
+msgid "Edit template"
+msgstr "Modifier un template"
+
+#: src/ManageVars.php:142
+msgid "Unselect template"
+msgstr "Désélectionner un template"
+
+#: src/Pager.php:40
+msgid "Template widget"
+msgstr "Template widget"
+
+#: src/Pager.php:101
+msgid "edit"
+msgstr "modifier"
+
+#: src/Pager.php:101
+msgid "edit the template"
+msgstr "modifier le template"
+
+#: src/Pager.php:107
+msgid "details"
+msgstr "détails"
+
+#: src/Pager.php:123
+msgid "copy"
+msgstr "copier"
+
+#: src/Pager.php:123
+msgid "copy the template"
+msgstr "copier le template"
+
+#: src/Pager.php:128
+msgid "delete the template"
+msgstr "supprimer le template"
+
+#: src/Prepend.php:37
+msgid "manage templates"
+msgstr "gérer les templates"
+
+#: src/Widgets.php:42
+msgid "Templator › Rendering"
+msgstr "Templator › Rendu"
+
+#: src/Widgets.php:47
+msgid "Template:"
+msgstr "Template&nbsp;:"
+
+msgid "Templator"
+msgstr "Templator"
+
 msgid "Templates"
 msgstr "Templates"
+
+#: src/Manage.php:611
+msgid "Create and select more templates for your posts"
+msgstr "Créer et sélectionner plus de templates pour vos billets"
 
