@@ -50,7 +50,7 @@ class Backend extends dcNsProcess
             dcCore::app()->menu[dcAdmin::MENU_PLUGINS]->addItem(
                 My::name(),
                 dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
-                urldecode(dcPage::getPF(My::id() . '/icon.png')),
+                urldecode(dcPage::getPF(My::id() . '/icon.svg')),
                 preg_match('/' . preg_quote(dcCore::app()->adminurl->get('admin.plugin.' . My::id())) . '(&.*)?$/', $_SERVER['REQUEST_URI']),
                 dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
                     dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
