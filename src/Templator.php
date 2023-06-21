@@ -87,6 +87,10 @@ class Templator
         $this->user_tpl_category = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_CATEGORY])) ?: '';
         $this->user_tpl_page     = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_PAGE])) ?: '';
 
+        if (!is_dir($this->path)) {
+            Files::makeDir($this->path);
+        }
+
         $this->findTemplates();
     }
 
