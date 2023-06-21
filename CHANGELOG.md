@@ -1,3 +1,8 @@
+1.5.2 - 2023.06.21
+- require dotclear 2.26
+- require PHP 8.1+
+- fix unset template path
+
 1.5.1 - 2023.05.13
 - require dotclear 2.26
 - require PHP 8.1+
