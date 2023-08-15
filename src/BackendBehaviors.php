@@ -16,10 +16,15 @@ namespace Dotclear\Plugin\templator;
 
 use ArrayObject;
 use dcCore;
-use dcPage;
-use dcPostsActions;
-use Dotclear\Database\Cursor;
-use Dotclear\Database\MetaRecord;
+use Dotclear\Core\Backend\Action\ActionsPosts;
+use Dotclear\Core\Backend\{
+    Notices,
+    Page
+};
+use Dotclear\Database\{
+    Cursor,
+    MetaRecord
+};
 use Dotclear\Helper\Html\Html;
 use Exception;
 
@@ -29,7 +34,7 @@ class BackendBehaviors
 {
     public static function adminPostHeaders(): string
     {
-        return dcPage::jsModuleLoad(My::id() . '/js/admin.js');
+        return My::jsLoad('admin');
     }
 
     public static function adminPostFormItems(ArrayObject $main_items, ArrayObject $sidebar_items, ?MetaRecord $post): void
@@ -60,7 +65,7 @@ class BackendBehaviors
         }
     }
 
-    public static function adminPostsActions(dcPostsActions $pa): void
+    public static function adminPostsActions(ActionsPosts $pa): void
     {
         $pa->addAction(
             [
@@ -72,7 +77,7 @@ class BackendBehaviors
         );
     }
 
-    public static function adminPostsActionsCallback(dcPostsActions $pa, ArrayObject $post): void
+    public static function adminPostsActionsCallback(ActionsPosts $pa, ArrayObject $post): void
     {
         # No entry
         $posts_ids = $pa->getIDs();
@@ -91,7 +96,7 @@ class BackendBehaviors
                     }
                 }
 
-                dcPage::addSuccessNotice(__('Entries template updated.'));
+                Notices::addSuccessNotice(__('Entries template updated.'));
                 $pa->redirect(true);
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
@@ -99,7 +104,7 @@ class BackendBehaviors
         }
 
         $pa->beginPage(
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 Html::escapeHTML((string) dcCore::app()->blog?->name) => '',
                 $pa->getCallerTitle()                                 => $pa->getRedirection(true),
                 __('Entry template')                                  => '',

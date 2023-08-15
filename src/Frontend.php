@@ -15,24 +15,22 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\templator;
 
 use dcCore;
-use dcNsProcess;
+use Dotclear\Core\Process;
 use Dotclear\Database\MetaRecord;
 
 /**
  * Frontend prepend.
  */
-class Frontend extends dcNsProcess
+class Frontend extends Process
 {
     public static function init(): bool
     {
-        static::$init = defined('DC_RC_PATH');
-
-        return static::$init;
+        return self::status(My::checkContext(My::FRONTEND));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 

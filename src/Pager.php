@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\templator;
 
 use dcCore;
-use dcPage;
 use Dotclear\Helper\File\File;
 use Dotclear\Helper\File\Files;
 use Exception;
@@ -33,8 +32,8 @@ class Pager
         $count       = '';
         $params      = [];
         $link        = 'media_item.php?id=' . $f->media_id;
-        $link_edit   = dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'edit', 'file' => $f->basename]);
-        $icon        = dcPage::getPF('templator/img/template.png');
+        $link_edit   = My::manageUrl(['part' => 'edit', 'file' => $f->basename]);
+        $icon        = My::fileURL('img/template.png');
         $class       = 'media-item media-col-' . ($i % 2);
         $details     = $special = '';
         $widget_icon = '<span class="widget" title="' . __('Template widget') . '">&diams;</span>';
@@ -51,7 +50,7 @@ class Pager
             $fname               = '<strong>' . __('Category') . '</strong> :&nbsp;' . $full_name . $category->f('cat_title');
             $params['cat_id']    = $cat_id;
             $params['post_type'] = '';
-            $icon                = dcPage::getPF('templator/img/template-alt.png');
+            $icon                = My::fileURL('img/template-alt.png');
             $part                = 'copycat';
 
             try {
@@ -68,7 +67,7 @@ class Pager
             }
         } elseif (preg_match('/^widget-(.+)$/', $f->basename)) {
             $count   = '&nbsp;';
-            $icon    = dcPage::getPF('templator/img/template-widget.png');
+            $icon    = My::fileURL('img/template-widget.png');
             $special = $widget_icon;
         } else {
             $params['meta_id']   = $f->basename;
@@ -78,11 +77,11 @@ class Pager
             try {
                 $counter = dcCore::app()->meta->getPostsByMeta($params, true)?->f(0);
                 $counter = is_numeric($counter) ? (int) $counter : 0;
-                $url     = dcCore::app()->adminurl->get('admin.plugin.templator', [
+                $url     = My::manageUrl([
                     'part'  => 'posts',
                     'file'  => $fname,
-                    'redir' => dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'files']),
-                ]);
+                    'redir' => My::manageUrl(['part' => 'files'], '&amp;'),
+                ], '&');
                 if ($counter == 0) {
                     $count = __('No entry');
                 } elseif ($counter == 1) {
@@ -119,12 +118,12 @@ class Pager
         $res .= '<li class="media-action">&nbsp;';
 
         $res .= '<a class="media-remove" href="' .
-        dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => $part, 'file' => $f->basename]) . '">' .
+        My::manageUrl(['part' => $part, 'file' => $f->basename]) . '">' .
         '<img src="images/plus.png" alt="' . __('copy') . '" title="' . __('copy the template') . '" /></a>&nbsp;';
 
         if ($f->del) {
             $res .= '<a class="media-remove" href="' .
-            dcCore::app()->adminurl->get('admin.plugin.templator', ['part' => 'delete', 'file' => $f->basename]) . '">' .
+            My::manageUrl(['part' => 'delete', 'file' => $f->basename]) . '">' .
             '<img src="images/trash.png" alt="' . __('delete') . '" title="' . __('delete the template') . '" /></a>';
         }
 

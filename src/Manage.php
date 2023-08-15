@@ -14,41 +14,34 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\templator;
 
-use adminGenericFilterV2;
-use adminPostList;
-use dcAdminFilters;
 use dcCore;
-use dcNsProcess;
-use dcPage;
-use dcPager;
+use Dotclear\Core\Backend\Filter\{
+    Filters,
+    FiltersLibrary
+};
+use Dotclear\Core\Backend\Listing\ListingPosts;
+use Dotclear\Core\Backend\Listing\Pager as corePager;
+use Dotclear\Core\Backend\{
+    Notices,
+    Page
+};
+use Dotclear\Core\Process;
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\Html\Html;
 use Exception;
 
 use form;
 
-class Manage extends dcNsProcess
+class Manage extends Process
 {
     public static function init(): bool
     {
-        static::$init == defined('DC_CONTEXT_ADMIN')
-            && !is_null(dcCore::app()->blog)
-            && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-                dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
-                My::PERMISSION_TEMPLATOR,
-            ]), dcCore::app()->blog->id);
-
-        return static::$init;
+        return self::status(My::checkContext(My::MANAGE));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
-            return false;
-        }
-
-        // nullsafe
-        if (is_null(dcCore::app()->blog)) {
+        if (!self::status()) {
             return false;
         }
 
@@ -71,8 +64,8 @@ class Manage extends dcNsProcess
                 $t->initializeTpl($name, $_POST['filesource']);
 
                 if (!dcCore::app()->error->flag()) {
-                    dcPage::addSuccessNotice(__('The new template has been successfully created.'));
-                    dcCore::app()->adminurl->redirect('admin.plugin.' . My::id());
+                    Notices::addSuccessNotice(__('The new template has been successfully created.'));
+                    My::redirect();
                 }
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
@@ -90,8 +83,8 @@ class Manage extends dcNsProcess
                 );
 
                 if (!dcCore::app()->error->flag()) {
-                    dcPage::addSuccessNotice(__('The template has been successfully copied.'));
-                    dcCore::app()->adminurl->redirect('admin.plugin.' . My::id(), ['part' => 'files']);
+                    Notices::addSuccessNotice(__('The template has been successfully copied.'));
+                    My::redirect(['part' => 'files']);
                 }
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
@@ -109,8 +102,8 @@ class Manage extends dcNsProcess
                 );
 
                 if (!dcCore::app()->error->flag()) {
-                    dcPage::addSuccessNotice(__('The template has been successfully copied.'));
-                    dcCore::app()->adminurl->redirect('admin.plugin.' . My::id(), ['part' => 'files']);
+                    Notices::addSuccessNotice(__('The template has been successfully copied.'));
+                    My::redirect(['part' => 'files']);
                 }
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
@@ -127,8 +120,8 @@ class Manage extends dcNsProcess
                 dcCore::app()->meta->delMeta($file, 'template');
 
                 if (!dcCore::app()->error->flag()) {
-                    dcPage::addSuccessNotice(__('The template has been successfully removed.'));
-                    dcCore::app()->adminurl->redirect('admin.plugin.' . My::id(), ['part' => 'files']);
+                    Notices::addSuccessNotice(__('The template has been successfully removed.'));
+                    My::redirect(['part' => 'files']);
                 }
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
@@ -140,7 +133,7 @@ class Manage extends dcNsProcess
 
     public static function render(): void
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return;
         }
 
@@ -159,28 +152,28 @@ class Manage extends dcNsProcess
 
         if (!$t->canUseRessources(true)) {
             dcCore::app()->error->add(__('The plugin is unusable with your configuration. You have to change file permissions.'));
-            dcPage::openModule(My::name());
+            Page::openModule(My::name());
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
-                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                My::name()    => My::manageUrl(),
             ]) .
-            dcPage::notices();
+            Notices::getNotices();
 
             /*
              * Duplicate dotclear template
              */
         } elseif ('new' == $v->part) {
-            dcPage::openModule(My::name());
+            Page::openModule(My::name());
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
-                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                My::name()    => My::manageUrl(),
                 $v->name      => '',
             ]) .
-            dcPage::notices() .
+            Notices::getNotices() .
 
-            '<form action="' . dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'new']) . '" method="post" id="add-template">' .
+            '<form action="' . My::manageUrl(['part' => 'new']) . '" method="post" id="add-template">' .
             '<h3>' . $v->name . '</h3>' .
             '<p><label for="filesource" class="required"><abbr title="' . __('Required field') . '">*</abbr> ' . __('Template source:') . '</label> ' .
             form::combo('filesource', $v->sources) . '</p>' .
@@ -197,7 +190,7 @@ class Manage extends dcNsProcess
 
             echo
             '<p>' .
-            dcCore::app()->formNonce() .
+            My::parsedHiddenFields() .
             '<input type="submit" value="' . __('Create') . '" /></p>' .
             '</form>';
 
@@ -205,16 +198,16 @@ class Manage extends dcNsProcess
              * Copy templator template
              */
         } elseif ('copy' == $v->part && !empty($_REQUEST['file'])) {
-            dcPage::openModule(My::name());
+            Page::openModule(My::name());
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
-                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                My::name()    => My::manageUrl(),
                 $v->name      => '',
             ]) .
-            dcPage::notices() .
+            Notices::getNotices() .
 
-            '<form action="' . dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'copy']) . '" method="post">' .
+            '<form action="' . My::manageUrl(['part' => 'copy']) . '" method="post">' .
             '<h3>' . $v->name . '</h3>' .
             '<p><label for="filename" class="required"><abbr title="' . __('Required field') . '">*</abbr> ' . __('New filename:') . '</label> ' .
             form::field('filename', 25, 255) . '<code>' . Html::escapeHTML('.html') . '</code></p> ' .
@@ -224,9 +217,8 @@ class Manage extends dcNsProcess
             ) . '</p>' .
             '<p>' .
             '<input type="submit" name="submit" value="' . __('Copy') . '" /> ' .
-            '<a class="button" href="' . dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'files']) . '">' . __('Cancel') . '</a>' .
-            dcCore::app()->formNonce() .
-            form::hidden('file', Html::escapeHTML($_REQUEST['file'])) . '</p>' .
+            '<a class="button" href="' . My::manageUrl(['part' => 'files']) . '">' . __('Cancel') . '</a>' .
+            My::parsedHiddenFields(['file' => Html::escapeHTML($_REQUEST['file'])]) . '</p>' .
             '</form>';
 
             /*
@@ -241,16 +233,16 @@ class Manage extends dcNsProcess
             };
             $name = $full_name . dcCore::app()->blog->getCategory($category_id)->f('cat_title');
 
-            dcPage::openModule(My::name());
+            Page::openModule(My::name());
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
-                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                My::name()    => My::manageUrl(),
                 $v->name      => '',
             ]) .
-            dcPage::notices() .
+            Notices::getNotices() .
 
-            '<form action="' . dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'copycat']) . '" method="post">' .
+            '<form action="' . My::manageUrl(['part' => 'copycat']) . '" method="post">' .
             '<h3>' . $v->name . '</h3>' .
             '<p><label for="filecat" class="required"><abbr title="' . __('Required field') . '">*</abbr> ' . __('Target category:') . '</label> ' .
             form::combo('filecat', $v->categories, '') . '</p>' .
@@ -260,60 +252,58 @@ class Manage extends dcNsProcess
                 $name
             ) . '</p>' .
             '<input type="submit" name="submit" value="' . __('Copy') . '" /> ' .
-            '<a class="button" href="' . dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'files']) . '">' . __('Cancel') . '</a>' .
-            dcCore::app()->formNonce() .
-            form::hidden('file', Html::escapeHTML($_REQUEST['file'])) . '</p>' .
+            '<a class="button" href="' . My::manageUrl(['part' => 'files']) . '">' . __('Cancel') . '</a>' .
+            My::parsedHiddenFields(['file' => Html::escapeHTML($_REQUEST['file'])]) . '</p>' .
             '</form>';
 
             /*
              * Delete templator template
              */
         } elseif ('delete' == $v->part && !empty($_REQUEST['file'])) {
-            dcPage::openModule(My::name());
+            Page::openModule(My::name());
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
-                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                My::name()    => My::manageUrl(),
                 $v->name      => '',
             ]) .
-            dcPage::notices() .
+            Notices::getNotices() .
 
-            '<form action="' . dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'delete']) . '" method="post">' .
+            '<form action="' . My::manageUrl(['part' => 'delete']) . '" method="post">' .
             '<h3>' . $v->name . '</h3>' .
             '<p>' . sprintf(
                 __('Are you sure you want to remove the template "%s"?'),
                 Html::escapeHTML($_GET['file'])
             ) . '</p>' .
             '<p><input type="submit" class="delete" value="' . __('Delete') . '" /> ' .
-            '<a class="button" href="' . dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'files']) . '">' . __('Cancel') . '</a>' .
-            dcCore::app()->formNonce() .
-            form::hidden('file', Html::escapeHTML($_GET['file'])) . '</p>' .
+            '<a class="button" href="' . My::manageUrl(['part' => 'files']) . '">' . __('Cancel') . '</a>' .
+            My::parsedHiddenFields(['file' => Html::escapeHTML($_GET['file'])]) . '</p>' .
             '</form>';
 
             /*
              * List templator templates
              */
         } elseif ('files' == $v->part) {
-            dcPage::openModule(My::name());
+            Page::openModule(My::name());
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
-                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                My::name()    => My::manageUrl(),
                 $v->name      => '',
             ]) .
-            dcPage::notices() .
+            Notices::getNotices() .
             '<h3>' . $v->name . '</h3>';
 
             if (count($v->items) == 0) {
                 echo '<p><strong>' . __('No template.') . '</strong></p>';
             } else {
                 // reuse "used templatro template" filter settings
-                $filter = new adminGenericFilterV2(My::id());
-                $filter->add(dcAdminFilters::getPageFilter());
+                $filter = new Filters(My::id());
+                $filter->add(FiltersLibrary::getPageFilter());
                 $page = is_numeric($filter->value('page')) ? (int) $filter->value('page') : 1;
                 $nb   = is_numeric($filter->value('nb')) ? (int) $filter->value('nb') : 1;
 
-                $pager = new dcPager($page, count($v->items), $nb, 10);
+                $pager = new corePager($page, count($v->items), $nb, 10);
 
                 echo
                 '<div class="media-list">' .
@@ -361,11 +351,11 @@ class Manage extends dcNsProcess
 
                 $cols[$col] .= '<tr class="line">' .
                     '<td class="maximal"><a href="' .
-                    dcCore::app()->adminurl->get('admin.plugin.' . My::id(), [
+                    My::manageUrl([
                         'part'  => 'posts',
                         'file'  => $meta_id,
-                        'redir' => dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'used']),
-                    ]) . '">' . $meta_id . '</a> ' . $img_status . '</td>' .
+                        'redir' => My::manageUrl(['part' => 'used'], '&amp;'),
+                    ], '&') . '">' . $meta_id . '</a> ' . $img_status . '</td>' .
                     '<td class="nowrap"><strong>' . $count . '</strong> ' .
                     (($count == 1) ? __('entry') : __('entries')) . '</td>' .
                 '</tr>';
@@ -375,17 +365,17 @@ class Manage extends dcNsProcess
 
             $table = '<div class="col"><table class="tags">%s</table></div>';
 
-            dcPage::openModule(
+            Page::openModule(
                 My::name(),
-                dcPage::cssModuleLoad('tags/style.css')
+                Page::cssModuleLoad('tags/style.css')
             );
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
-                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                My::name()    => My::manageUrl(),
                 $v->name      => '',
             ]) .
-            dcPage::notices() .
+            Notices::getNotices() .
             '<h3>' . $v->name . '</h3>';
 
             if ($cols[0]) {
@@ -437,38 +427,38 @@ class Manage extends dcNsProcess
 
             $ict = dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax_theme');
 
-            dcPage::openModule(
+            Page::openModule(
                 My::name(),
                 (
                     dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax') ?
-                    dcPage::jsJson('dotclear_colorsyntax', ['colorsyntax' => dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax')]) : ''
+                    Page::jsJson('dotclear_colorsyntax', ['colorsyntax' => dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax')]) : ''
                 ) .
-                dcPage::jsJson('theme_editor_msg', [
+                Page::jsJson('theme_editor_msg', [
                     'saving_document'    => __('Saving document...'),
                     'document_saved'     => __('Document saved'),
                     'error_occurred'     => __('An error occurred:'),
                     'confirm_reset_file' => __('Are you sure you want to reset this file?'),
                 ]) .
-                dcPage::jsModuleLoad('themeEditor/js/script.js') .
-                dcPage::jsConfirmClose('file-form') .
+                Page::jsModuleLoad('themeEditor/js/script.js') .
+                Page::jsConfirmClose('file-form') .
                 (
                     dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax') ?
-                    dcPage::jsLoadCodeMirror(is_string($ict) ? $ict : '') : ''
+                    Page::jsLoadCodeMirror(is_string($ict) ? $ict : '') : ''
                 ) .
-                dcPage::cssModuleLoad('themeEditor/style.css')
+                Page::cssModuleLoad('themeEditor/style.css')
             );
 
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
-                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                My::name()    => My::manageUrl(),
                 $v->name      => '',
             ]) .
-            dcPage::notices();
+            Notices::getNotices();
 
             if (($file['c'] !== null)) {
                 echo
-                '<form id="file-form" action="' . dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'edit', 'file' => $name]) . '" method="post">' .
+                '<form id="file-form" action="' . My::manageUrl(['part' => 'edit', 'file' => $name]) . '" method="post">' .
                 '<div><h3><label for="file_content">' . sprintf(__('Editing file %s'), '<strong>' . $name) . '</strong></label></h3>' .
                 '<p>' . form::textarea('file_content', 72, 25, [
                     'default'  => Html::escapeHTML($file['c']),
@@ -479,9 +469,8 @@ class Manage extends dcNsProcess
                 if ($file['w']) {
                     echo
                     '<p><input type="submit" name="write" value="' . __('Save') . '" accesskey="s" /> ' .
-                    '<a class="button" href="' . dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'files']) . '">' . __('Cancel') . '</a>' .
-                    dcCore::app()->formNonce() .
-                    form::hidden(['file_id'], Html::escapeHTML($file['f'])) .
+                    '<a class="button" href="' . My::manageUrl(['part' => 'files']) . '">' . __('Cancel') . '</a>' .
+                    My::parsedHiddenFields(['file_id' => Html::escapeHTML($file['f'])]) .
                     '</p>';
                 } else {
                     echo '<p>' . __('This file is not writable. Please check your files permissions.') . '</p>';
@@ -492,9 +481,9 @@ class Manage extends dcNsProcess
                 if (dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax')) {
                     $ict = dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax_theme');
                     echo
-                    dcPage::jsJson('theme_editor_mode', ['mode' => 'html']) .
-                    dcPage::jsModuleLoad('themeEditor/js/mode.js') .
-                    dcPage::jsRunCodeMirror('editor', 'file_content', 'dotclear', is_string($ict) ? $ict : '');
+                    Page::jsJson('theme_editor_mode', ['mode' => 'html']) .
+                    Page::jsModuleLoad('themeEditor/js/mode.js') .
+                    Page::jsRunCodeMirror('editor', 'file_content', 'dotclear', is_string($ict) ? $ict : '');
                 }
             }
 
@@ -503,7 +492,7 @@ class Manage extends dcNsProcess
              */
         } elseif ('posts' == $v->part && (!empty($_REQUEST['file']) || $_REQUEST['file'] == '0')) {
             $file  = $_REQUEST['file'];
-            $redir = $_REQUEST['redir'] ?? dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'used']);
+            $redir = $_REQUEST['redir'] ?? My::manageUrl(['part' => 'used']);
 
             # Unselect the template
             if (!empty($_POST['action']) && 'unselecttpl' == $_POST['action'] && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
@@ -512,14 +501,14 @@ class Manage extends dcNsProcess
             ]), dcCore::app()->blog->id)) {
                 try {
                     dcCore::app()->meta->delMeta($file, 'template');
-                    dcCore::app()->adminurl->redirect('admin.plugin.' . My::id(), ['part' => 'posts', 'file' => $file]);
+                    My::redirect(['part' => 'posts', 'file' => $file]);
                 } catch (Exception $e) {
                     dcCore::app()->error->add($e->getMessage());
                 }
             }
 
-            $filter = new adminGenericFilterV2('templator');
-            $filter->add(dcAdminFilters::getPageFilter());
+            $filter = new Filters('templator');
+            $filter->add(FiltersLibrary::getPageFilter());
             $filter->add('part', 'posts');
             $filter->add('file', $file);
             $filter->add('post_type', '');
@@ -537,25 +526,25 @@ class Manage extends dcNsProcess
                 }
                 $counter   = dcCore::app()->meta->getPostsByMeta($params, true)?->f(0);
                 $counter   = is_numeric($counter) ? (int) $counter : 0;
-                $post_list = new adminPostList($posts, $counter);
+                $post_list = new ListingPosts($posts, $counter);
             } catch (Exception $e) {
                 dcCore::app()->error->add($e->getMessage());
             }
 
-            dcPage::openModule(
+            Page::openModule(
                 My::name(),
-                dcPage::jsFilterControl($filter->show()) .
-                dcPage::jsModuleLoad(My::id() . '/js/posts.js') .
-                $filter->js(dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'posts', 'file' => $file]))
+                Page::jsFilterControl($filter->show()) .
+                My::jsLoad('posts') .
+                $filter->js(My::manageUrl(['part' => 'posts', 'file' => $file]))
             );
 
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
-                My::name()    => dcCore::app()->adminurl->get('admin.plugin.' . My::id()),
+                My::name()    => My::manageUrl(),
                 $v->name      => '',
             ]) .
-            dcPage::notices() .
+            Notices::getNotices() .
 
             '<h3>' . sprintf(__('Unselect template "%s"'), '<strong>' . $file . '</strong>') . '</h3>' .
             '<p><a class ="back" href="' . $redir . '">' . __('Back') . '</a></p>';
@@ -574,7 +563,7 @@ class Manage extends dcNsProcess
                     $post_list->display(
                         $page,
                         $nb,
-                        '<form action="' . dcCore::app()->adminurl->get('admin.plugin.' . My::id()) . '" method="post" id="form-entries">' .
+                        '<form action="' . My::manageUrl() . '" method="post" id="form-entries">' .
 
                         '%s' .
 
@@ -598,13 +587,13 @@ class Manage extends dcNsProcess
              * Default page
              */
         } else {
-            dcPage::openModule(My::name());
+            Page::openModule(My::name());
             echo
-            dcPage::breadcrumb([
+            Page::breadcrumb([
                 __('Plugins') => '',
                 My::name()    => '',
             ]) .
-            dcPage::notices();
+            Notices::getNotices();
 
             $line = '<li><a href="%s">%s</a></li>';
             echo '
@@ -613,24 +602,24 @@ class Manage extends dcNsProcess
                 '<h3><ul class="nice">%s</ul></h3>',
                 sprintf(
                     $line,
-                    dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'files']),
+                    My::manageUrl(['part' => 'files']),
                     __('Available templates')
                 ) .
                 sprintf(
                     $line,
-                    dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'used']),
+                    My::manageUrl(['part' => 'used']),
                     __('Used templates')
                 ) .
                 sprintf(
                     $line,
-                    dcCore::app()->adminurl->get('admin.plugin.' . My::id(), ['part' => 'new']),
+                    My::manageUrl(['part' => 'new']),
                     __('New template')
                 )
             );
         }
 
-        dcPage::helpBlock('templator');
+        Page::helpBlock('templator');
 
-        dcPage::closeModule();
+        Page::closeModule();
     }
 }
