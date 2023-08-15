@@ -18,19 +18,19 @@ $this->registerModule(
     'Templates engine',
     'Create and select more templates for your posts',
     'Osku and contributors',
-    '1.5.2',
+    '1.6',
     [
         'requires' => [
             ['php', '8.1'],
-            ['core', '2.26'],
+            ['core', '2.27'],
         ],
         'permissions' => dcCore::app()->auth->makePermissions([
             dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
             initTemplator::PERMISSION_TEMPLATOR,
         ]),
         'type'       => 'plugin',
-        'support'    => 'https://github.com/JcDenis/templator',
-        'details'    => 'https://plugins.dotaddict.org/dc2/details/templator',
-        'repository' => 'https://raw.githubusercontent.com/JcDenis/templator/master/dcstore.xml',
+        'support'    => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/issues',
+        'details'    => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/src/branch/master/README.md',
+        'repository' => 'https://git.dotclear.watch/JcDenis/' . basename(__DIR__) . '/raw/branch/master/dcstore.xml',
     ]
 );

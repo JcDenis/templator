@@ -1,11 +1,10 @@
 # README
 
-[![Release](https://img.shields.io/github/v/release/JcDenis/templator)](https://github.com/JcDenis/templator/releases)
-[![Date](https://img.shields.io/github/release-date/JcDenis/templator)](https://github.com/JcDenis/templator/releases)
-[![Issues](https://img.shields.io/github/issues/JcDenis/templator)](https://github.com/JcDenis/templator/issues)
-[![Dotclear](https://img.shields.io/badge/dotclear-v2.26-blue.svg)](https://fr.dotclear.org/download)
-[![Dotaddict](https://img.shields.io/badge/dotaddict-official-green.svg)](https://plugins.dotaddict.org/dc2/details/templator)
-[![License](https://img.shields.io/github/license/JcDenis/templator)](https://github.com/JcDenis/templator/blob/master/LICENSE)
+[![Release](https://img.shields.io/badge/release-1.6-a2cbe9.svg)](https://git.dotclear.watch/JcDenis/templator/releases)
+[![Date](https://img.shields.io/badge/date-2023.08.15-c44d58.svg)](https://git.dotclear.watch/JcDenis/templator/releases)
+[![Dotclear](https://img.shields.io/badge/dotclear-v2.27-137bbb.svg)](https://fr.dotclear.org/download)
+[![Dotaddict](https://img.shields.io/badge/dotaddict-official-9ac123.svg)](https://plugins.dotaddict.org/dc2/details/templator)
+[![License](https://img.shields.io/github/license/JcDenis/templator)](https://git.dotclear.watch/JcDenis/templator/blob/master/LICENSE)
 
 ## WHAT IS TEMPLATOR ?
 
@@ -18,12 +17,12 @@ You can attribute a template to a post or a category.
 
 ## REQUIREMENTS
 
- _templator_ requires: 
+_templator_ requires: 
 
-  * conten admin or templator 
-  * Dotclear 2.26
-  * PHP 8.1+
-  * A writable directory on public path to store tempaltes
+* content admin or templator 
+* Dotclear 2.27
+* PHP 8.1+
+* A writable directory on public path to store tempaltes
 
 ## USAGE
 
@@ -35,14 +34,14 @@ You can manage your additional templates from menu
 
 ## LINKS
 
- * License : [GNU GPL v2](https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html)
- * Source & contribution : [GitHub Page](https://github.com/JcDenis/templator)
- * Packages & details:  [Dotaddict Page](https://plugins.dotaddict.org/dc2/details/templator)
- * Discuss and help : [Dotclear Forum](http://forum.dotclear.net/viewtopic.php?id=42059)
+* License : [GNU GPL v2](https://www.gnu.org/licenses/old-licenses/lgpl-2.0.html)
+* Source & contribution : [Gitea Page](https://git.dotclear.watch/JcDenis/templator) or [GitHub Page](https://github.com/JcDenis/templator)
+* Packages & details: [Gitea Page](https://git.dotclear.watch/JcDenis/templator/releases) or [Dotaddict Page](https://plugins.dotaddict.org/dc2/details/templator)
+* Discuss and help : [Dotclear Forum](http://forum.dotclear.net/viewtopic.php?id=42059)
 
 ## CONTRIBUTORS
 
- * Osku (author)
- * Jean-Christian Denis
+* Osku (author)
+* Jean-Christian Denis
 
- You are welcome to contribute to this code.
+You are welcome to contribute to this code.
