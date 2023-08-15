@@ -25,7 +25,7 @@ class Backend extends dcNsProcess
     public static function init(): bool
     {
         static::$init == defined('DC_CONTEXT_ADMIN')
-            && !is_null(dcCore::app()->blog) && !is_null(dcCore::app()->auth)
+            && !is_null(dcCore::app()->blog)
             && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
                 My::PERMISSION_TEMPLATOR,
                 dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
@@ -41,7 +41,7 @@ class Backend extends dcNsProcess
         }
 
         // nullsafe
-        if (is_null(dcCore::app()->auth) || is_null(dcCore::app()->blog) || is_null(dcCore::app()->adminurl)) {
+        if (is_null(dcCore::app()->blog)) {
             return false;
         }
 

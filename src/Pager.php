@@ -24,7 +24,7 @@ class Pager
 {
     public static function line(File $f, int $i): string
     {
-        if (is_null(dcCore::app()->blog) || is_null(dcCore::app()->adminurl)) {
+        if (is_null(dcCore::app()->blog)) {
             return '';
         }
 
