@@ -1,25 +1,20 @@
 <?php
-/**
- * @brief templator, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Osku and contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\templator;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Plugin\widgets\WidgetsStack;
 use Dotclear\Plugin\widgets\WidgetsElement;
 
 /**
- * Widgets.
+ * @brief       templator widgets class.
+ * @ingroup     templator
+ *
+ * @author      Osku (author)
+ * @author      Jean-Christian Denis (latest)
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Widgets
 {
@@ -40,7 +35,7 @@ class Widgets
             ->create(
                 'templatorWidget',
                 __('Templator › Rendering'),
-                [self::class, 'getDataTpl']
+                self::getDataTpl(...)
             )
             ->setting(
                 'template',
@@ -53,7 +48,7 @@ class Widgets
 
     public static function getDataTpl(WidgetsElement $w): string
     {
-        return is_string($w->__get('template')) && dcCore::app()->tpl->getFilePath($w->__get('template')) ?
-            dcCore::app()->tpl->getData($w->__get('template')) : '';
+        return is_string($w->__get('template')) && App::frontend()->template()->getFilePath($w->__get('template')) ?
+            App::frontend()->template()->getData($w->__get('template')) : '';
     }
 }

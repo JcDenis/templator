@@ -1,20 +1,10 @@
 <?php
-/**
- * @brief templator, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Osku and contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\templator;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\Filter\{
     Filters,
     FiltersLibrary
@@ -32,6 +22,14 @@ use Exception;
 
 use form;
 
+/**
+ * @brief       templator manage class.
+ * @ingroup     templator
+ *
+ * @author      Osku (author)
+ * @author      Jean-Christian Denis (latest)
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class Manage extends Process
 {
     public static function init(): bool
@@ -63,12 +61,12 @@ class Manage extends Process
                 }
                 $t->initializeTpl($name, $_POST['filesource']);
 
-                if (!dcCore::app()->error->flag()) {
+                if (!App::error()->flag()) {
                     Notices::addSuccessNotice(__('The new template has been successfully created.'));
                     My::redirect();
                 }
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
         }
 
@@ -82,12 +80,12 @@ class Manage extends Process
                     rawurldecode($_POST['file'])
                 );
 
-                if (!dcCore::app()->error->flag()) {
+                if (!App::error()->flag()) {
                     Notices::addSuccessNotice(__('The template has been successfully copied.'));
                     My::redirect(['part' => 'files']);
                 }
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
         }
 
@@ -101,12 +99,12 @@ class Manage extends Process
                     rawurldecode($_POST['file'])
                 );
 
-                if (!dcCore::app()->error->flag()) {
+                if (!App::error()->flag()) {
                     Notices::addSuccessNotice(__('The template has been successfully copied.'));
                     My::redirect(['part' => 'files']);
                 }
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
         }
 
@@ -117,14 +115,14 @@ class Manage extends Process
             try {
                 $file = rawurldecode($_POST['file']);
                 $v->media->removeItem($file);
-                dcCore::app()->meta->delMeta($file, 'template');
+                App::meta()->delMeta($file, 'template');
 
                 if (!dcCore::app()->error->flag()) {
                     Notices::addSuccessNotice(__('The template has been successfully removed.'));
                     My::redirect(['part' => 'files']);
                 }
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
         }
 
@@ -133,12 +131,9 @@ class Manage extends Process
 
     public static function render(): void
     {
-        if (!self::status()) {
-            return;
-        }
-
-        // nullsafe
-        if (is_null(dcCore::app()->blog)) {
+        if (!self::status()
+            || !App::blog()->isDefined()
+        ) {
             return;
         }
 
@@ -151,7 +146,7 @@ class Manage extends Process
          */
 
         if (!$t->canUseRessources(true)) {
-            dcCore::app()->error->add(__('The plugin is unusable with your configuration. You have to change file permissions.'));
+            App::error()->add(__('The plugin is unusable with your configuration. You have to change file permissions.'));
             Page::openModule(My::name());
             echo
             Page::breadcrumb([
@@ -226,12 +221,12 @@ class Manage extends Process
              */
         } elseif ('copycat' == $v->part && !empty($_REQUEST['file'])) {
             $category_id = (int) str_replace(['category-','.html'], '', $_REQUEST['file']);
-            $cat_parents = dcCore::app()->blog->getCategoryParents($category_id);
+            $cat_parents = App::blog()->getCategoryParents($category_id);
             $full_name   = '';
             while ($cat_parents->fetch()) {
                 $full_name = $cat_parents->f('cat_title') . ' &rsaquo; ';
             };
-            $name = $full_name . dcCore::app()->blog->getCategory($category_id)->f('cat_title');
+            $name = $full_name . App::blog()->getCategory($category_id)->f('cat_title');
 
             Page::openModule(My::name());
             echo
@@ -322,8 +317,8 @@ class Manage extends Process
              * List Used templator template
              */
         } elseif ('used' == $v->part) {
-            $tags = dcCore::app()->meta->getMetadata(['meta_type' => 'template']);
-            $tags = dcCore::app()->meta->computeMetaStats($tags);
+            $tags = App::meta()->getMetadata(['meta_type' => 'template']);
+            $tags = App::meta()->computeMetaStats($tags);
             $tags->sort('meta_id_lower', 'asc');
 
             $last_letter = null;
@@ -403,9 +398,9 @@ class Manage extends Process
                     $name = $file['f'];
 
                     if (preg_match('/^category-(.+).html$/', $name, $cat_id)) {
-                        $category    = dcCore::app()->blog->getCategory((int) $cat_id[1]);
+                        $category    = App::blog()->getCategory((int) $cat_id[1]);
                         $full_name   = '';
-                        $cat_parents = dcCore::app()->blog->getCategoryParents((int) $cat_id[1]);
+                        $cat_parents = App::blog()->getCategoryParents((int) $cat_id[1]);
                         while ($cat_parents->fetch()) {
                             $full_name = $cat_parents->f('cat_title') . ' &rsaquo; ';
                         };
@@ -422,16 +417,16 @@ class Manage extends Process
                     $t->writeTpl($file['f'], $file['c']);
                 }
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
 
-            $ict = dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax_theme');
+            $ict = App::auth()->prefs()->get('interface')->get('colorsyntax_theme');
 
             Page::openModule(
                 My::name(),
                 (
-                    dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax') ?
-                    Page::jsJson('dotclear_colorsyntax', ['colorsyntax' => dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax')]) : ''
+                    App::auth()->prefs()->get('interface')->get('colorsyntax') ?
+                    Page::jsJson('dotclear_colorsyntax', ['colorsyntax' => App::auth()->prefs()->get('interface')->get('colorsyntax')]) : ''
                 ) .
                 Page::jsJson('theme_editor_msg', [
                     'saving_document'    => __('Saving document...'),
@@ -442,7 +437,7 @@ class Manage extends Process
                 Page::jsModuleLoad('themeEditor/js/script.js') .
                 Page::jsConfirmClose('file-form') .
                 (
-                    dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax') ?
+                    App::auth()->prefs()->get('interface')->get('colorsyntax') ?
                     Page::jsLoadCodeMirror(is_string($ict) ? $ict : '') : ''
                 ) .
                 Page::cssModuleLoad('themeEditor/style.css')
@@ -478,8 +473,8 @@ class Manage extends Process
 
                 echo
                 '</div></form>';
-                if (dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax')) {
-                    $ict = dcCore::app()->auth->user_prefs->get('interface')->get('colorsyntax_theme');
+                if (App::auth()->prefs()->get('interface')->get('colorsyntax')) {
+                    $ict = App::auth()->prefs()->get('interface')->get('colorsyntax_theme');
                     echo
                     Page::jsJson('theme_editor_mode', ['mode' => 'html']) .
                     Page::jsModuleLoad('themeEditor/js/mode.js') .
@@ -495,15 +490,15 @@ class Manage extends Process
             $redir = $_REQUEST['redir'] ?? My::manageUrl(['part' => 'used']);
 
             # Unselect the template
-            if (!empty($_POST['action']) && 'unselecttpl' == $_POST['action'] && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-                dcCore::app()->auth::PERMISSION_PUBLISH,
-                dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
-            ]), dcCore::app()->blog->id)) {
+            if (!empty($_POST['action']) && 'unselecttpl' == $_POST['action'] && App::auth()->check(App::auth()->makePermissions([
+                App::auth()::PERMISSION_PUBLISH,
+                App::auth()::PERMISSION_CONTENT_ADMIN,
+            ]), App::blog()->id())) {
                 try {
-                    dcCore::app()->meta->delMeta($file, 'template');
+                    App::meta()->delMeta($file, 'template');
                     My::redirect(['part' => 'posts', 'file' => $file]);
                 } catch (Exception $e) {
-                    dcCore::app()->error->add($e->getMessage());
+                    App::error()->add($e->getMessage());
                 }
             }
 
@@ -520,15 +515,15 @@ class Manage extends Process
 
             # Get posts
             try {
-                $posts = dcCore::app()->meta->getPostsByMeta($params);
+                $posts = App::meta()->getPostsByMeta($params);
                 if (is_null($posts)) {
                     throw new Exception(__('Failed to get posts meta'));
                 }
-                $counter   = dcCore::app()->meta->getPostsByMeta($params, true)?->f(0);
+                $counter   = App::meta()->getPostsByMeta($params, true)?->f(0);
                 $counter   = is_numeric($counter) ? (int) $counter : 0;
                 $post_list = new ListingPosts($posts, $counter);
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
 
             Page::openModule(
@@ -549,7 +544,7 @@ class Manage extends Process
             '<h3>' . sprintf(__('Unselect template "%s"'), '<strong>' . $file . '</strong>') . '</h3>' .
             '<p><a class ="back" href="' . $redir . '">' . __('Back') . '</a></p>';
 
-            if (!dcCore::app()->error->flag() && isset($posts)) {
+            if (!App::error()->flag() && isset($posts)) {
                 if ($posts->isEmpty() && !$filter->show()) {
                     echo '<p>' . __('There is no entries') . '</p>';
                 } else {
@@ -573,9 +568,9 @@ class Manage extends Process
                         '<p class="col right">' .
                          '<input type="submit" value="' . __('Unselect template for selected entries') . '" /></p>' .
                         form::hidden('action', 'unselecttpl') .
-                        dcCore::app()->adminurl->getHiddenFormFields('admin.plugin.' . My::id(), $filter->values()) .
+                        App::backend()->url()->getHiddenFormFields('admin.plugin.' . My::id(), $filter->values()) .
                         form::hidden('redir', $redir) .
-                        dcCore::app()->formNonce() .
+                        App::nonce()->getFormNonce() .
                         '</div>' .
                         '</form>',
                         $filter->show()

@@ -1,25 +1,20 @@
 <?php
-/**
- * @brief templator, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Osku and contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\templator;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 use Dotclear\Database\MetaRecord;
 
 /**
- * Frontend prepend.
+ * @brief       templator frontend class.
+ * @ingroup     templator
+ *
+ * @author      Osku (author)
+ * @author      Jean-Christian Denis (latest)
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Frontend extends Process
 {
@@ -34,41 +29,37 @@ class Frontend extends Process
             return false;
         }
 
-        dcCore::app()->tpl->setPath(
-            dcCore::app()->tpl->getPath(),
+        App::frontend()->template()->setPath(
+            App::frontend()->template()->getPath(),
             Templator::instance()->getPath()
         );
 
-        dcCore::app()->addBehaviors([
+        App::behavior()->addBehaviors([
             'urlHandlerBeforeGetData' => function ($_): void {
-                if (is_null(dcCore::app()->ctx)) {
-                    return;
-                }
-
-                if ((dcCore::app()->ctx->__get('posts') instanceof MetaRecord)
-                    && (array_key_exists(dcCore::app()->url->type, dcCore::app()->getPostTypes()) || dcCore::app()->url->type == 'pages')) {
+                if ((App::frontend()->context()->__get('posts') instanceof MetaRecord)
+                    && (array_key_exists(App::url()->type, App::postTypes()->getPostTypes()) || App::url()->type == 'pages')) {
                     $params              = [];
                     $params['meta_type'] = 'template';
-                    $params['post_id']   = dcCore::app()->ctx->__get('posts')->f('post_id');
-                    $post_meta           = dcCore::app()->meta->getMetadata($params);
+                    $params['post_id']   = App::frontend()->context()->__get('posts')->f('post_id');
+                    $post_meta           = App::meta()->getMetadata($params);
 
-                    if (!$post_meta->isEmpty() && is_string($post_meta->f('meta_id')) && dcCore::app()->tpl->getFilePath($post_meta->f('meta_id'))) {
-                        dcCore::app()->ctx->__set('current_tpl', $post_meta->f('meta_id'));
+                    if (!$post_meta->isEmpty() && is_string($post_meta->f('meta_id')) && App::frontend()->template()->getFilePath($post_meta->f('meta_id'))) {
+                        App::frontend()->context()->__set('current_tpl', $post_meta->f('meta_id'));
                     }
                 }
 
-                if (dcCore::app()->ctx->__get('current_tpl') == 'category.html'
-                    && (dcCore::app()->ctx->__get('categories') instanceof MetaRecord)
-                    && is_string(dcCore::app()->ctx->__get('categories')->f('cat_id'))
-                    && preg_match('/^[0-9]{1,}/', dcCore::app()->ctx->__get('categories')->f('cat_id'), $cat_id)
+                if (App::frontend()->context()->__get('current_tpl') == 'category.html'
+                    && (App::frontend()->context()->__get('categories') instanceof MetaRecord)
+                    && is_string(App::frontend()->context()->__get('categories')->f('cat_id'))
+                    && preg_match('/^[0-9]{1,}/', App::frontend()->context()->__get('categories')->f('cat_id'), $cat_id)
                 ) {
                     $tpl = 'category-' . $cat_id[0] . '.html';
-                    if (dcCore::app()->tpl->getFilePath($tpl)) {
-                        dcCore::app()->ctx->__set('current_tpl', $tpl);
+                    if (App::frontend()->template()->getFilePath($tpl)) {
+                        App::frontend()->context()->__set('current_tpl', $tpl);
                     }
                 }
             },
-            'initWidgets' => [Widgets::class, 'initWidgets'],
+            'initWidgets' => Widgets::initWidgets(...),
         ]);
 
         return true;

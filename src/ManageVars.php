@@ -1,25 +1,24 @@
 <?php
-/**
- * @brief templator, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Osku and contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\templator;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Helper\File\File;
 use Dotclear\Helper\Html\Html;
+use Dotclear\Interface\Core\MediaInterface;
+use Dotclear\Plugin\pages\Pages;
 use Exception;
-use initPages;
 
+/**
+ * @brief       templator vars class.
+ * @ingroup     templator
+ *
+ * @author      Osku (author)
+ * @author      Jean-Christian Denis (latest)
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class ManageVars
 {
     /** @var    ManageVars  $container  Self instance  */
@@ -31,8 +30,8 @@ class ManageVars
     /** @var    string  $part   The requested manage part */
     public readonly string $part;
 
-    /** @var    Media   $media  The limited media instance */
-    public readonly Media $media;
+    /** @var    MediaInterface  $media  The limited media instance */
+    public readonly MediaInterface $media;
 
     /** @var    array<int,File>   $items  The media items */
     public readonly array $items;
@@ -57,10 +56,11 @@ class ManageVars
         $this->part = empty($name) ? '' : $_REQUEST['part'];
 
         // Extend dcMedia to change settings to allow .html vs media_exclusion
-        $this->media = new Media();
+        $this->media = clone App::media();
+        $this->media->setExcludePattern('/^(.html)$/i');
         $this->media->chdir(Templator::MY_TPL_DIR);
         // For users with only templator permission, we use sudo.
-        dcCore::app()->auth?->sudo([$this->media,'getDir']);
+        App::auth()->sudo($this->media->getDir(...));
         $dir         = $this->media->dir;
         $this->items = array_values($dir['files']);
 
@@ -69,7 +69,7 @@ class ManageVars
         $has_categories   = false;
 
         try {
-            $categories = dcCore::app()->blog?->getCategories(['post_type' => 'post']);
+            $categories = App::blog()->getCategories(['post_type' => 'post']);
             if (!is_null($categories)) {
                 $l         = is_numeric($categories->f('level')) ? (int) $categories->f('level') : 1;
                 $full_name = [is_string($categories->f('cat_title')) ? $categories->f('cat_title') : ''];
@@ -103,8 +103,8 @@ class ManageVars
             'post.html'          => 'post',
         ];
 
-        if (dcCore::app()->plugins->moduleExists('pages')
-            && dcCore::app()->auth?->check(dcCore::app()->auth->makePermissions([initPages::PERMISSION_PAGES]), dcCore::app()->blog?->id)
+        if (App::plugins()->moduleExists('pages')
+            && App::auth()->check(App::auth()->makePermissions([Pages::PERMISSION_PAGES]), App::blog()->id())
         ) {
             $sources_combo['page.html'] = 'page';
         }

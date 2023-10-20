@@ -1,33 +1,31 @@
 <?php
-/**
- * @brief templator, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Osku and contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\templator;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Helper\File\File;
 use Dotclear\Helper\File\Files;
 use Exception;
 
+/**
+ * @brief       templator backend pager class.
+ * @ingroup     templator
+ *
+ * @author      Osku (author)
+ * @author      Jean-Christian Denis (latest)
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class Pager
 {
     public static function line(File $f, int $i): string
     {
-        if (is_null(dcCore::app()->blog)) {
+        if (!App::blog()->isDefined()) {
             return '';
         }
 
-        $p_url       = dcCore::app()->admin->getPageURL();
+        $p_url       = App::backend()->getPageURL();
         $fname       = $f->basename;
         $count       = '';
         $params      = [];
@@ -41,9 +39,9 @@ class Pager
 
         if (preg_match('/^category-(.+).html$/', $f->basename, $cat_id)) {
             $cat_id      = (int) $cat_id[1];
-            $category    = dcCore::app()->blog->getCategory($cat_id);
+            $category    = App::blog()->getCategory($cat_id);
             $full_name   = '';
-            $cat_parents = dcCore::app()->blog->getCategoryParents($cat_id);
+            $cat_parents = App::blog()->getCategoryParents($cat_id);
             while ($cat_parents->fetch()) {
                 $full_name = $cat_parents->f('cat_title') . ' &rsaquo; ';
             };
@@ -54,7 +52,7 @@ class Pager
             $part                = 'copycat';
 
             try {
-                $counter = dcCore::app()->blog->getPosts($params, true);
+                $counter = App::blog()->getPosts($params, true);
                 if ($counter->f(0) == 0) {
                     $count = __('No entry');
                 } elseif ($counter->f(0) == 1) {
@@ -63,7 +61,7 @@ class Pager
                     $count = '<strong>' . $counter->f(0) . '</strong> <a href="posts.php?cat_id=' . $cat_id . '">' . __('entries') . '</a>';
                 }
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
         } elseif (preg_match('/^widget-(.+)$/', $f->basename)) {
             $count   = '&nbsp;';
@@ -75,7 +73,7 @@ class Pager
             $params['post_type'] = '';
 
             try {
-                $counter = dcCore::app()->meta->getPostsByMeta($params, true)?->f(0);
+                $counter = App::meta()->getPostsByMeta($params, true)?->f(0);
                 $counter = is_numeric($counter) ? (int) $counter : 0;
                 $url     = My::manageUrl([
                     'part'  => 'posts',
@@ -90,7 +88,7 @@ class Pager
                     $count = '<strong>' . $counter . '</strong> <a href="' . $url . '">' . __('entries') . '</a>';
                 }
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
         }
 
@@ -99,10 +97,10 @@ class Pager
         '<ul>' .
         '<li><a class="media-link" href="' . $link_edit . '"><img src="images/edit-mini.png" alt="' . __('edit') . '" title="' . __('edit the template') . '" /> ' . $fname . '</a> ' . $special . '</li>';
         /*
-                if (dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-                    dcAuth::PERMISSION_CONTENT_ADMIN,
-                    initTemplator::PERMISSION_TEMPLATOR,
-                ]), dcCore::app()->blog->id)) {
+                if (App::auth()->check(App::auth()->makePermissions([
+                    App::auth()::PERMISSION_CONTENT_ADMIN,
+                    My::PERMISSION_TEMPLATOR,
+                ]), App::blog()->id())) {
                     $details = ' - <a href="' . $link . '">' . __('details') . '</a>';
                 }
         */

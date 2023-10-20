@@ -1,41 +1,39 @@
 <?php
-/**
- * @brief templator, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Osku and contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\templator;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Module\MyPlugin;
 
 /**
- * This module definitions.
+ * @brief       templator My helper.
+ * @ingroup     templator
+ *
+ * @author      Osku (author)
+ * @author      Jean-Christian Denis (latest)
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class My extends MyPlugin
 {
-    /** @var    string  This module permission */
+    /**
+     * The module permission.
+     *
+     * @var     string  PERMISSION_TEMPLATOR
+     */
     public const PERMISSION_TEMPLATOR = 'templator';
 
     public static function checkCustomContext(int $context): ?bool
     {
-        if (in_array($context, [My::BACKEND, My::MENU, My::MANAGE])) {
-            return defined('DC_CONTEXT_ADMIN')
-                && !is_null(dcCore::app()->blog)
-                && dcCore::app()->auth->check(dcCore::app()->auth->makePermissions([
-                    My::PERMISSION_TEMPLATOR,
-                    dcCore::app()->auth::PERMISSION_CONTENT_ADMIN,
-                ]), dcCore::app()->blog->id);
-        }
+        return match ($context) {
+            self::BACKEND, self::MENU, self::MANAGE => App::task()->checkContext('BACKEND')
+                && App::auth()->check(App::auth()->makePermissions([
+                    self::PERMISSION_TEMPLATOR,
+                    App::auth()::PERMISSION_CONTENT_ADMIN,
+                ]), App::blog()->id()),
 
-        return null;
+            default => null,
+        };
     }
 }

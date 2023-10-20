@@ -1,22 +1,20 @@
 <?php
-/**
- * @brief templator, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Osku and contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\templator;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 
+/**
+ * @brief       templator backend class.
+ * @ingroup     templator
+ *
+ * @author      Osku (author)
+ * @author      Jean-Christian Denis (latest)
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class Backend extends Process
 {
     public static function init(): bool
@@ -32,19 +30,19 @@ class Backend extends Process
 
         My::addBackendMenuItem();
 
-        dcCore::app()->addBehaviors([
-            'adminPostHeaders'      => [BackendBehaviors::class,'adminPostHeaders'],
-            'adminPostFormItems'    => [BackendBehaviors::class,'adminPostFormItems'],
-            'adminPageHeaders'      => [BackendBehaviors::class,'adminPostHeaders'],
-            'adminPageFormItems'    => [BackendBehaviors::class,'adminPostFormItems'],
-            'adminAfterPostCreate'  => [BackendBehaviors::class,'adminBeforePostUpdate'],
-            'adminBeforePostUpdate' => [BackendBehaviors::class,'adminBeforePostUpdate'],
-            'adminAfterPageCreate'  => [BackendBehaviors::class,'adminBeforePostUpdate'],
-            'adminBeforePageUpdate' => [BackendBehaviors::class,'adminBeforePostUpdate'],
-            'adminPostsActions'     => [BackendBehaviors::class,'adminPostsActions'],
-            'adminPagesActions'     => [BackendBehaviors::class,'adminPostsActions'],
-            'adminFiltersListsV2'   => [BackendBehaviors::class, 'adminFiltersListsV2'],
-            'initWidgets'           => [Widgets::class, 'initWidgets'],
+        App::behavior()->addBehaviors([
+            'adminPostHeaders'      => BackendBehaviors::adminPostHeaders(...),
+            'adminPostFormItems'    => BackendBehaviors::adminPostFormItems(...),
+            'adminPageHeaders'      => BackendBehaviors::adminPostHeaders(...),
+            'adminPageFormItems'    => BackendBehaviors::adminPostFormItems(...),
+            'adminAfterPostCreate'  => BackendBehaviors::adminBeforePostUpdate(...),
+            'adminBeforePostUpdate' => BackendBehaviors::adminBeforePostUpdate(...),
+            'adminAfterPageCreate'  => BackendBehaviors::adminBeforePostUpdate(...),
+            'adminBeforePageUpdate' => BackendBehaviors::adminBeforePostUpdate(...),
+            'adminPostsActions'     => BackendBehaviors::adminPostsActions(...),
+            'adminPagesActions'     => BackendBehaviors::adminPostsActions(...),
+            'adminFiltersListsV2'   => BackendBehaviors::adminFiltersListsV2(...),
+            'initWidgets'           => Widgets::initWidgets(...),
         ]);
 
         return true;

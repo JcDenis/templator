@@ -14,14 +14,19 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\templator;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\File\Path;
 use Dotclear\Helper\Html\Html;
 use Exception;
 
 /**
- * Templator main class.
+ * @brief       templator main class.
+ * @ingroup     templator
+ *
+ * @author      Osku (author)
+ * @author      Jean-Christian Denis (latest)
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 class Templator
 {
@@ -69,20 +74,20 @@ class Templator
      */
     public function __construct()
     {
-        if (is_null(dcCore::app()->blog)) {
+        if (!App::blog()->isDefined()) {
             throw new Exception(__('Blog is not set'));
         }
 
-        $page_root = dcCore::app()->plugins->getDefine('pages')->get('root');
+        $page_root = App::plugins()->getDefine('pages')->get('root');
 
         // Initial templates
-        $this->path              = implode(DIRECTORY_SEPARATOR, [dcCore::app()->blog->public_path, self::MY_TPL_DIR]);
-        $this->file_tpl_post     = implode(DIRECTORY_SEPARATOR, [DC_ROOT, 'inc', 'public', self::DC_TPL_DIR, self::DEFAULT_TPLSET, self::DEFAULT_TPL_POST]);
-        $this->file_tpl_category = implode(DIRECTORY_SEPARATOR, [DC_ROOT, 'inc', 'public', self::DC_TPL_DIR, self::DEFAULT_TPLSET, self::DEFAULT_TPL_CATEGORY]);
+        $this->path              = implode(DIRECTORY_SEPARATOR, [App::blog()->publicPath(), self::MY_TPL_DIR]);
+        $this->file_tpl_post     = implode(DIRECTORY_SEPARATOR, [App::config()->dotclearRoot(), 'inc', 'public', self::DC_TPL_DIR, self::DEFAULT_TPLSET, self::DEFAULT_TPL_POST]);
+        $this->file_tpl_category = implode(DIRECTORY_SEPARATOR, [App::config()->dotclearRoot(), 'inc', 'public', self::DC_TPL_DIR, self::DEFAULT_TPLSET, self::DEFAULT_TPL_CATEGORY]);
         $this->file_tpl_page     = Path::real(implode(DIRECTORY_SEPARATOR, [$page_root, self::DC_TPL_DIR, self::DEFAULT_TPLSET, self::DEFAULT_TPL_PAGE])) ?: '';
 
         // user templates
-        $this->user_path_theme   = dcCore::app()->blog->themes_path . DIRECTORY_SEPARATOR . dcCore::app()->blog->settings->get('system')->get('theme');
+        $this->user_path_theme   = App::blog()->themesPath() . DIRECTORY_SEPARATOR . App::blog()->settings()->get('system')->get('theme');
         $this->user_tpl_post     = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_POST])) ?: '';
         $this->user_tpl_category = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_CATEGORY])) ?: '';
         $this->user_tpl_page     = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_PAGE])) ?: '';

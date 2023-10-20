@@ -1,21 +1,11 @@
 <?php
-/**
- * @brief templator, a plugin for Dotclear 2
- *
- * @package Dotclear
- * @subpackage Plugin
- *
- * @author Osku and contributors
- *
- * @copyright Jean-Christian Denis
- * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
- */
+
 declare(strict_types=1);
 
 namespace Dotclear\Plugin\templator;
 
 use ArrayObject;
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Backend\Action\ActionsPosts;
 use Dotclear\Core\Backend\{
     Notices,
@@ -30,6 +20,14 @@ use Exception;
 
 use form;
 
+/**
+ * @brief       templator backend behaviors.
+ * @ingroup     templator
+ *
+ * @author      Osku (author)
+ * @author      Jean-Christian Denis (latest)
+ * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 class BackendBehaviors
 {
     public static function adminPostHeaders(): string
@@ -42,7 +40,7 @@ class BackendBehaviors
         $selected = '';
 
         if (!is_null($post)) {
-            $post_meta = dcCore::app()->meta->getMetadata(['meta_type' => 'template', 'post_id' => $post->f('post_id')]);
+            $post_meta = App::meta()->getMetadata(['meta_type' => 'template', 'post_id' => $post->f('post_id')]);
             $selected  = $post_meta->isEmpty() ? '' : $post_meta->f('meta_id');
         }
 
@@ -58,9 +56,9 @@ class BackendBehaviors
         $post_id = (int) $post_id;
 
         if (isset($_POST['post_tpl'])) {
-            dcCore::app()->meta->delPostMeta($post_id, 'template');
+            App::meta()->delPostMeta($post_id, 'template');
             if (!empty($_POST['post_tpl'])) {
-                dcCore::app()->meta->setPostMeta($post_id, 'template', $_POST['post_tpl']);
+                App::meta()->setPostMeta($post_id, 'template', $_POST['post_tpl']);
             }
         }
     }
@@ -73,7 +71,7 @@ class BackendBehaviors
                     __('Select the template') => 'tpl',
                 ],
             ],
-            [self::class, 'adminPostsActionsCallback']
+            self::adminPostsActionsCallback(...)
         );
     }
 
@@ -90,24 +88,24 @@ class BackendBehaviors
         if (isset($post['post_tpl']) && is_string($post['post_tpl'])) {
             try {
                 foreach ($posts_ids as $post_id) {
-                    dcCore::app()->meta->delPostMeta($post_id, 'template');
+                    App::meta()->delPostMeta($post_id, 'template');
                     if (!empty($post['post_tpl'])) {
-                        dcCore::app()->meta->setPostMeta($post_id, 'template', $post['post_tpl']);
+                        App::meta()->setPostMeta($post_id, 'template', $post['post_tpl']);
                     }
                 }
 
                 Notices::addSuccessNotice(__('Entries template updated.'));
                 $pa->redirect(true);
             } catch (Exception $e) {
-                dcCore::app()->error->add($e->getMessage());
+                App::error()->add($e->getMessage());
             }
         }
 
         $pa->beginPage(
             Page::breadcrumb([
-                Html::escapeHTML((string) dcCore::app()->blog?->name) => '',
-                $pa->getCallerTitle()                                 => $pa->getRedirection(true),
-                __('Entry template')                                  => '',
+                Html::escapeHTML(App::blog()->name()) => '',
+                $pa->getCallerTitle()                 => $pa->getRedirection(true),
+                __('Entry template')                  => '',
             ])
         );
 
@@ -120,7 +118,7 @@ class BackendBehaviors
 
         '<p>' .
         $pa->getHiddenFields() .
-        dcCore::app()->formNonce() .
+        App::nonce()->getFormNonce() .
         form::hidden(['action'], 'tpl') .
         '<input type="submit" value="' . __('Save') . '" /></p>' .
         '</form>';
