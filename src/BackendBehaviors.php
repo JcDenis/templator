@@ -35,6 +35,10 @@ class BackendBehaviors
         return My::jsLoad('admin');
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>  $main_items
+     * @param   ArrayObject<string, mixed>  $sidebar_items
+     */
     public static function adminPostFormItems(ArrayObject $main_items, ArrayObject $sidebar_items, ?MetaRecord $post): void
     {
         $selected = '';
@@ -75,6 +79,9 @@ class BackendBehaviors
         );
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>  $post
+     */
     public static function adminPostsActionsCallback(ActionsPosts $pa, ArrayObject $post): void
     {
         # No entry
@@ -126,6 +133,9 @@ class BackendBehaviors
         $pa->endPage();
     }
 
+    /**
+     * @param   ArrayObject<string, mixed>  $sorts
+     */
     public static function adminFiltersListsV2(ArrayObject $sorts): void
     {
         $sorts[My::id()] = [
@@ -142,7 +152,7 @@ class BackendBehaviors
     }
 
     /**
-     * @return  array<string,string>
+     * @return  array<string, string>
      */
     private static function getTemplateCombo(): array
     {

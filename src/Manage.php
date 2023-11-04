@@ -117,7 +117,7 @@ class Manage extends Process
                 $v->media->removeItem($file);
                 App::meta()->delMeta($file, 'template');
 
-                if (!dcCore::app()->error->flag()) {
+                if (!App::error()->flag()) {
                     Notices::addSuccessNotice(__('The template has been successfully removed.'));
                     My::redirect(['part' => 'files']);
                 }
@@ -515,11 +515,8 @@ class Manage extends Process
 
             # Get posts
             try {
-                $posts = App::meta()->getPostsByMeta($params);
-                if (is_null($posts)) {
-                    throw new Exception(__('Failed to get posts meta'));
-                }
-                $counter   = App::meta()->getPostsByMeta($params, true)?->f(0);
+                $posts     = App::meta()->getPostsByMeta($params);
+                $counter   = App::meta()->getPostsByMeta($params, true)->f(0);
                 $counter   = is_numeric($counter) ? (int) $counter : 0;
                 $post_list = new ListingPosts($posts, $counter);
             } catch (Exception $e) {
@@ -544,7 +541,7 @@ class Manage extends Process
             '<h3>' . sprintf(__('Unselect template "%s"'), '<strong>' . $file . '</strong>') . '</h3>' .
             '<p><a class ="back" href="' . $redir . '">' . __('Back') . '</a></p>';
 
-            if (!App::error()->flag() && isset($posts)) {
+            if (!App::error()->flag() && isset($posts) && isset($post_list)) {
                 if ($posts->isEmpty() && !$filter->show()) {
                     echo '<p>' . __('There is no entries') . '</p>';
                 } else {

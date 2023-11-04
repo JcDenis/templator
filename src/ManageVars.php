@@ -21,32 +21,64 @@ use Exception;
  */
 class ManageVars
 {
-    /** @var    ManageVars  $container  Self instance  */
+    /**
+     * Self instance.
+     *
+     * @var     ManageVars  $container
+     */
     private static $container;
 
-    /** @var    string  $name   The requested manage part name*/
+    /**
+     * The requested manage part name.
+     *
+     * @var     string  $name
+     */
     public readonly string $name;
 
-    /** @var    string  $part   The requested manage part */
+    /**
+     * The requested manage part.
+     *
+     * @var     string  $part
+     */
     public readonly string $part;
 
-    /** @var    MediaInterface  $media  The limited media instance */
+    /**
+     * The limited media instance.
+     *
+     * @var     MediaInterface  $media
+     */
     public readonly MediaInterface $media;
 
-    /** @var    array<int,File>   $items  The media items */
+    /**
+     * The media items.
+     *
+     * @var     array<int, File>    $items
+     */
     public readonly array $items;
 
-    /** @var    array<string,int>   $categories     The blog categories list */
+    /**
+     * The blog categories list.
+     *
+     * @var     array<string, int>  $categories
+     */
     public readonly array $categories;
 
-    /** @var    bool    $has_categories     Blog has categories */
+    /**
+     * Blog has categories.
+     *
+     * @var     bool    $has_categories
+     */
     public readonly bool $has_categories;
 
-    /** @var    array<string,string>   $sources    The templates list */
+    /**
+     * The templates list.
+     *
+     * @var     array<string, string>   $sources
+     */
     public readonly array $sources;
 
     /**
-     * Constructo sets properties.
+     * Constructor sets properties.
      */
     public function __construct()
     {
@@ -61,8 +93,7 @@ class ManageVars
         $this->media->chdir(Templator::MY_TPL_DIR);
         // For users with only templator permission, we use sudo.
         App::auth()->sudo($this->media->getDir(...));
-        $dir         = $this->media->dir;
-        $this->items = array_values($dir['files']);
+        $this->items = array_values($this->media->getFiles());
 
         // categories
         $categories_combo = [];
@@ -70,28 +101,27 @@ class ManageVars
 
         try {
             $categories = App::blog()->getCategories(['post_type' => 'post']);
-            if (!is_null($categories)) {
-                $l         = is_numeric($categories->f('level')) ? (int) $categories->f('level') : 1;
-                $full_name = [is_string($categories->f('cat_title')) ? $categories->f('cat_title') : ''];
 
-                while ($categories->fetch()) {
-                    $id    = is_numeric($categories->f('cat_id')) ? (int) $categories->f('cat_id') : 1;
-                    $level = is_numeric($categories->f('level')) ? (int) $categories->f('level') : 1;
-                    $title = is_string($categories->f('cat_title')) ? $categories->f('cat_title') : '';
+            $l         = is_numeric($categories->f('level')) ? (int) $categories->f('level') : 1;
+            $full_name = [is_string($categories->f('cat_title')) ? $categories->f('cat_title') : ''];
 
-                    if ($level < $l) {
-                        $full_name = [];
-                    } elseif ($level == $l) {
-                        array_pop($full_name);
-                    }
-                    $full_name[] = Html::escapeHTML($title);
+            while ($categories->fetch()) {
+                $id    = is_numeric($categories->f('cat_id')) ? (int) $categories->f('cat_id') : 1;
+                $level = is_numeric($categories->f('level')) ? (int) $categories->f('level') : 1;
+                $title = is_string($categories->f('cat_title')) ? $categories->f('cat_title') : '';
 
-                    $categories_combo[implode(' &rsaquo; ', $full_name)] = $id;
-
-                    $l = $level;
+                if ($level < $l) {
+                    $full_name = [];
+                } elseif ($level == $l) {
+                    array_pop($full_name);
                 }
-                $has_categories = !$categories->isEmpty();
+                $full_name[] = Html::escapeHTML($title);
+
+                $categories_combo[implode(' &rsaquo; ', $full_name)] = $id;
+
+                $l = $level;
             }
+            $has_categories = !$categories->isEmpty();
         } catch (Exception $e) {
         }
         $this->categories     = $categories_combo;

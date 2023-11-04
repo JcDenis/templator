@@ -29,10 +29,7 @@ class Frontend extends Process
             return false;
         }
 
-        App::frontend()->template()->setPath(
-            App::frontend()->template()->getPath(),
-            Templator::instance()->getPath()
-        );
+        App::frontend()->template()->appendPath(Templator::instance()->getPath());
 
         App::behavior()->addBehaviors([
             'urlHandlerBeforeGetData' => function ($_): void {

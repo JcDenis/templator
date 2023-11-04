@@ -73,7 +73,7 @@ class Pager
             $params['post_type'] = '';
 
             try {
-                $counter = App::meta()->getPostsByMeta($params, true)?->f(0);
+                $counter = App::meta()->getPostsByMeta($params, true)->f(0);
                 $counter = is_numeric($counter) ? (int) $counter : 0;
                 $url     = My::manageUrl([
                     'part'  => 'posts',

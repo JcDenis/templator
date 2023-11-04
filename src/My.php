@@ -27,6 +27,7 @@ class My extends MyPlugin
     public static function checkCustomContext(int $context): ?bool
     {
         return match ($context) {
+            // Add templator perm to backend
             self::BACKEND, self::MENU, self::MANAGE => App::task()->checkContext('BACKEND')
                 && App::auth()->check(App::auth()->makePermissions([
                     self::PERMISSION_TEMPLATOR,
