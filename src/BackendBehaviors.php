@@ -44,7 +44,7 @@ class BackendBehaviors
         $selected = '';
 
         if (!is_null($post)) {
-            $post_meta = App::meta()->getMetadata(['meta_type' => 'template', 'post_id' => $post->f('post_id')]);
+            $post_meta = App::meta()->getMetadata(['meta_type' => 'template', 'post_id' => $post->f('post_id'), 'post_type' => $post->post_type]);
             $selected  = $post_meta->isEmpty() ? '' : $post_meta->f('meta_id');
         }
 

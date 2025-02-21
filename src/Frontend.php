@@ -38,6 +38,7 @@ class Frontend extends Process
                     $params              = [];
                     $params['meta_type'] = 'template';
                     $params['post_id']   = App::frontend()->context()->__get('posts')->f('post_id');
+                    $params['post_type'] = '';
                     $post_meta           = App::meta()->getMetadata($params);
 
                     if (!$post_meta->isEmpty() && is_string($post_meta->f('meta_id')) && App::frontend()->template()->getFilePath($post_meta->f('meta_id'))) {

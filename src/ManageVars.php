@@ -89,7 +89,7 @@ class ManageVars
 
         // Extend dcMedia to change settings to allow .html vs media_exclusion
         $this->media = clone App::media();
-        $this->media->setExcludePattern('/^(.html)$/i');
+        $this->media->setExcludePattern('/^((?!.html).)*$/i');
         $this->media->chdir(Templator::MY_TPL_DIR);
         // For users with only templator permission, we use sudo.
         App::auth()->sudo($this->media->getDir(...));

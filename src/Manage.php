@@ -317,7 +317,7 @@ class Manage extends Process
              * List Used templator template
              */
         } elseif ('used' == $v->part) {
-            $tags = App::meta()->getMetadata(['meta_type' => 'template']);
+            $tags = App::meta()->getMetadata(['meta_type' => 'template', 'post_type' => '']);
             $tags = App::meta()->computeMetaStats($tags);
             $tags->sort('meta_id_lower', 'asc');
 
@@ -506,12 +506,13 @@ class Manage extends Process
             $filter->add(FiltersLibrary::getPageFilter());
             $filter->add('part', 'posts');
             $filter->add('file', $file);
-            $filter->add('post_type', '');
+            //$filter->add('post_type', '');
 
             $params               = $filter->params();
             $params['no_content'] = true;
             $params['meta_id']    = $file;
             $params['meta_type']  = 'template';
+            $params['post_type']  = '';
 
             # Get posts
             try {
