@@ -1,10 +1,10 @@
 # README
 
-[![Release](https://img.shields.io/badge/release-1.7.1-a2cbe9.svg)](https://git.dotclear.watch/JcDenis/templator/releases)
-![Date](https://img.shields.io/badge/date-2023.11.04-c44d58.svg)
-[![Dotclear](https://img.shields.io/badge/dotclear-v2.28-137bbb.svg)](https://fr.dotclear.org/download)
+[![Release](https://img.shields.io/github/v/release/jcdenis/templator?color=lightblue)](https://git.dotclear.watch/JcDenis/templator/releases)
+![Date](https://img.shields.io/github/release-date/jcdenis/templator?color=red)
+[![Dotclear](https://img.shields.io/badge/dotclear-v2.33-137bbb.svg)](https://fr.dotclear.org/download)
 [![Dotaddict](https://img.shields.io/badge/dotaddict-official-9ac123.svg)](https://plugins.dotaddict.org/dc2/details/templator)
-[![License](https://img.shields.io/badge/license-GPL--2.0-ececec.svg)](https://git.dotclear.watch/JcDenis/templator/src/branch/master/LICENSE)
+[![License](https://img.shields.io/github/license/jcdenis/templator?color=white)](https://git.dotclear.watch/JcDenis/templator/src/branch/master/LICENSE)
 
 ## ABOUT
 
@@ -16,7 +16,7 @@ You can attribute a template to a post or a category.
 
 ## REQUIREMENTS
 
-* Dotclear 2.28
+* Dotclear 2.33
 * PHP 8.1+
 * System writable directory on public path to store tempaltes
 * Dotclear content admin or templator 
@@ -29,12 +29,14 @@ Dotaddict repository. (See Dotclear's documentation to know how do this)
 You can manage your additional templates from menu 
 ''Templates engine'' on admin sidebar.
 
+Note: Remove all reference to __.html__ from about:config => system => media_exclusion
+
 ## LINKS
 
-* [License](https://git.dotclear.watch/JcDenis/templator/src/branch/master/LICENSE)
-* [Packages & details](https://git.dotclear.watch/JcDenis/templator/releases) (or on [Dotaddict](https://plugins.dotaddict.org/dc2/details/templator))
-* [Sources & contributions](https://git.dotclear.watch/JcDenis/templator) (or on [GitHub](https://github.com/JcDenis/templator))
-* [Issues & security](https://git.dotclear.watch/JcDenis/templator/issues) (or on [GitHub](https://github.com/JcDenis/templator/issues))
+* [License](https://forge.dotclear.watch/JcDenis/templator/src/branch/master/LICENSE)
+* [Packages & details](https://forge.dotclear.watch/JcDenis/templator/releases) (or on [Dotaddict](https://plugins.dotaddict.org/dc2/details/templator))
+* [Sources & contributions](https://forge.dotclear.watch/JcDenis/templator) (or on [GitHub](https://github.com/JcDenis/templator))
+* [Issues & security](https://forge.dotclear.watch/JcDenis/templator/issues) (or on [GitHub](https://github.com/JcDenis/templator/issues))
 * [Discuss & help](http://forum.dotclear.net/viewtopic.php?id=42059)
 
 ## CONTRIBUTORS
