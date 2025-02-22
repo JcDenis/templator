@@ -19,6 +19,7 @@ use Dotclear\Core\Process;
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\Html\Html;
 use Dotclear\Plugin\themeEditor\My as themeEditorMy;
+use Dotclear\Plugin\tags\My as tagsMy;
 use Exception;
 
 use form;
@@ -363,7 +364,7 @@ class Manage extends Process
 
             Page::openModule(
                 My::name(),
-                Page::cssModuleLoad('tags/style.css')
+                tagsMy::cssLoad('/style.css')
             );
             echo
             Page::breadcrumb([

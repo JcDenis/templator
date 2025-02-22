@@ -22,6 +22,7 @@ $this->registerModule(
     [
         'requires'    => [
             ['core', '2.33'],
+            ['tags', '2.1'],
             ['themeEditor', '2.0'],
         ],
         'permissions' => 'My',
