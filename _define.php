@@ -20,7 +20,10 @@ $this->registerModule(
     'Osku and contributors',
     '1.8',
     [
-        'requires'    => [['core', '2.33']],
+        'requires'    => [
+            ['core', '2.33'],
+            ['themeEditor', '2.0'],
+        ],
         'permissions' => 'My',
         'type'        => 'plugin',
         'support'     => 'https://github.com/JcDenis/' . $this->id . '/issues',

@@ -18,6 +18,7 @@ use Dotclear\Core\Backend\{
 use Dotclear\Core\Process;
 use Dotclear\Helper\File\Files;
 use Dotclear\Helper\Html\Html;
+use Dotclear\Plugin\themeEditor\My as themeEditorMy;
 use Exception;
 
 use form;
@@ -337,20 +338,20 @@ class Manage extends Process
                     $cols[$col] .= '<tr class="tagLetter"><td colspan="2"><span>' . $letter . '</span></td></tr>';
                 }
 
-                $img = '<img alt="%1$s" title="%1$s" src="images/%2$s" />';
+                $img = '<img alt="%1$s" title="%1$s" src="images/check-%2$s.svg" class="mark mark-check-%2$s" />';
                 if (array_key_exists($meta_id, $t->getTpl())) {
-                    $img_status = sprintf($img, __('available template'), 'check-on.png');
+                    $img_status = sprintf($img, __('available template'), 'on');
                 } else {
-                    $img_status = sprintf($img, __('missing template'), 'check-off.png');
+                    $img_status = sprintf($img, __('missing template'), 'off');
                 }
 
                 $cols[$col] .= '<tr class="line">' .
-                    '<td class="maximal"><a href="' .
+                    '<td class="maximal">' . $img_status . ' <a href="' .
                     My::manageUrl([
                         'part'  => 'posts',
                         'file'  => $meta_id,
                         'redir' => My::manageUrl(['part' => 'used'], '&amp;'),
-                    ], '&') . '">' . $meta_id . '</a> ' . $img_status . '</td>' .
+                    ], '&') . '">' . $meta_id . '</a></td>' .
                     '<td class="nowrap"><strong>' . $count . '</strong> ' .
                     (($count == 1) ? __('entry') : __('entries')) . '</td>' .
                 '</tr>';
@@ -434,13 +435,13 @@ class Manage extends Process
                     'error_occurred'     => __('An error occurred:'),
                     'confirm_reset_file' => __('Are you sure you want to reset this file?'),
                 ]) .
-                Page::jsModuleLoad('themeEditor/js/script.js') .
+                themeEditorMy::jsLoad('script.js') .
                 Page::jsConfirmClose('file-form') .
                 (
                     App::auth()->prefs()->get('interface')->get('colorsyntax') ?
                     Page::jsLoadCodeMirror(is_string($ict) ? $ict : '') : ''
                 ) .
-                Page::cssModuleLoad('themeEditor/style.css')
+                themeEditorMy::cssLoad('/style.css')
             );
 
             echo
@@ -477,7 +478,7 @@ class Manage extends Process
                     $ict = App::auth()->prefs()->get('interface')->get('colorsyntax_theme');
                     echo
                     Page::jsJson('theme_editor_mode', ['mode' => 'html']) .
-                    Page::jsModuleLoad('themeEditor/js/mode.js') .
+                    themeEditorMy::jsLoad('mode.js') .
                     Page::jsRunCodeMirror('editor', 'file_content', 'dotclear', is_string($ict) ? $ict : '');
                 }
             }
