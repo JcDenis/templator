@@ -23,9 +23,9 @@ $this->registerModule(
         'requires'    => [['core', '2.33']],
         'permissions' => 'My',
         'type'        => 'plugin',
-        'support'     => 'https://forge.dotclear.watch/JcDenis/' . $this->id . '/issues',
-        'details'     => 'https://forge.dotclear.watch/JcDenis/' . $this->id . '/src/branch/master/README.md',
-        'repository'  => 'https://forge.dotclear.watch/JcDenis/' . $this->id . '/raw/branch/master/dcstore.xml',
+        'support'     => 'https://github.com/JcDenis/' . $this->id . '/issues',
+        'details'     => 'https://github.com/JcDenis/' . $this->id . '/src/branch/master/README.md',
+        'repository'  => 'https://github.com/JcDenis/' . $this->id . '/raw/branch/master/dcstore.xml',
         'date'        => '2025-02-21T18:18:58+00:00',
     ]
 );

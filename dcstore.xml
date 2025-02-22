@@ -7,7 +7,7 @@
     <desc>Create and select more templates for your posts</desc>
     <file>https://github.com/JcDenis/templator/releases/download/v1.8/plugin-templator.zip</file>
     <da:dcmin>2.33</da:dcmin>
-    <da:details>https://git.dotclear.watch/JcDenis/templator/src/branch/master/README.md</da:details>
-    <da:support>https://git.dotclear.watch/JcDenis/templator/issues</da:support>
+    <da:details>https://github.com/JcDenis/templator/src/branch/master/README.md</da:details>
+    <da:support>https://github.com/JcDenis/templator/issues</da:support>
   </module>
 </modules>
