@@ -4,7 +4,7 @@
 ![Date](https://img.shields.io/github/release-date/jcdenis/templator?color=red)
 [![Dotclear](https://img.shields.io/badge/dotclear-v2.33-137bbb.svg)](https://fr.dotclear.org/download)
 [![Dotaddict](https://img.shields.io/badge/dotaddict-official-9ac123.svg)](https://plugins.dotaddict.org/dc2/details/templator)
-[![License](https://img.shields.io/github/license/jcdenis/templator?color=white)](https://github.com/JcDenis/templator/src/branch/master/LICENSE)
+[![License](https://img.shields.io/github/license/jcdenis/templator?color=white)](https://github.com/JcDenis/templator/blob/master/LICENSE)
 
 ## ABOUT
 
@@ -33,7 +33,7 @@ Note: Remove all reference to __.html__ from about:config => system => media_exc
 
 ## LINKS
 
-* [License](https://github.com/JcDenis/templator/src/branch/master/LICENSE)
+* [License](https://github.com/JcDenis/templator/blob/master/LICENSE)
 * [Packages & details](https://github.com/JcDenis/templator/releases) (or on [Dotaddict](https://plugins.dotaddict.org/dc2/details/templator))
 * [Sources & contributions](https://github.com/JcDenis/templator)
 * [Issues & security](https://github.com/JcDenis/templator/issues)
