@@ -1,9 +1,8 @@
-templator 1.8.1 - 2025.02.22
+templator 1.8.3 - 2025.03.02
 ===========================================================
 * Require Dotclear 2.33
 * Require PHP 8.1
-* Fix images
-* Fix deprecated
+* Fix repository URLs
 
 templator 1.8 - 2025.02.21
 ===========================================================

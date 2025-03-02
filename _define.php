@@ -18,7 +18,7 @@ $this->registerModule(
     'Templates engine',
     'Create and select more templates for your posts',
     'Osku and contributors',
-    '1.8.2',
+    '1.8.3',
     [
         'requires'    => [
             ['core', '2.33'],
