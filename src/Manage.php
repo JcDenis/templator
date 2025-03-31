@@ -17,12 +17,27 @@ use Dotclear\Core\Backend\{
 };
 use Dotclear\Core\Process;
 use Dotclear\Helper\File\Files;
+use Dotclear\Helper\Html\Form\{
+    Div,
+    Form,
+    Input,
+    Label,
+    Li,
+    Link,
+    Note,
+    None,
+    Ul,
+    Para,
+    Select,
+    Submit,
+    Text
+};
 use Dotclear\Helper\Html\Html;
 use Dotclear\Plugin\themeEditor\My as themeEditorMy;
 use Dotclear\Plugin\tags\My as tagsMy;
 use Exception;
 
-use form;
+//use form;
 
 /**
  * @brief       templator manage class.
@@ -170,26 +185,48 @@ class Manage extends Process
             ]) .
             Notices::getNotices() .
 
-            '<form action="' . My::manageUrl(['part' => 'new']) . '" method="post" id="add-template">' .
-            '<h3>' . $v->name . '</h3>' .
-            '<p><label for="filesource" class="required"><abbr title="' . __('Required field') . '">*</abbr> ' . __('Template source:') . '</label> ' .
-            form::combo('filesource', $v->sources) . '</p>' .
-            '<p><label for="filename" class="required"><abbr title="' . __('Required field') . '">*</abbr> ' . __('Filename:') . '</label> ' .
-            form::field('filename', 25, 255) . '</p>' .
-            '<p class="form-note">' . __('Extension .html is automatically added to filename.') . '</p>';
-
-            if ($v->has_categories) {
-                echo
-                '<p><label for="filecat" class="required"><abbr title="' . __('Required field') . '">*</abbr>' . __('Category:') . '</label> ' .
-                form::combo('filecat', $v->categories, '') . '</p>' .
-                '<p class="form-note">' . __('Required only for category template.') . '</p>';
-            }
-
-            echo
-            '<p>' .
-            My::parsedHiddenFields() .
-            '<input type="submit" value="' . __('Create') . '" /></p>' .
-            '</form>';
+            (new Form('add-template'))
+                ->method('post')
+                ->action(My::manageUrl(['part' => 'new']))
+                ->fields([
+                    (new Text('h3', $v->name)),
+                    (new Note())
+                        ->class('form-note')
+                        ->text(sprintf(__('Fields preceded by %s are mandatory.'), (new Text('span', '*'))->class('required')->render())),
+                    (new Para())
+                        ->items([
+                            (new Label((new Text('span', '*'))->render() . __('Title:')))
+                                ->class('required')
+                                ->for('filesource'),
+                            (new Select('filesource'))
+                                ->items($v->sources),
+                        ]),
+                    (new Para())->items([
+                        (new Label((new Text('span', '*'))->render() . __('Filename:')))
+                            ->class('required')
+                            ->for('filename'),
+                        (new Input('filename'))
+                            ->size(30)
+                            ->maxlength(255),
+                    ]),
+                    ($v->has_categories ? 
+                        (new Para())
+                            ->items([
+                                (new Label((new Text('span', '*'))->render() . __('Category:')))
+                                    ->class('required')
+                                    ->for('filecat'),
+                                (new Select('filecat'))
+                                    ->items($v->categories()),
+                            ])
+                        : (new None())
+                    ),
+                    (new Para())
+                        ->items([
+                            ... My::hiddenFields(),
+                            (new Submit(['submit'], __('Save'))),
+                        ]),
+                ])
+                ->render();
 
             /*
              * Copy templator template
@@ -204,19 +241,40 @@ class Manage extends Process
             ]) .
             Notices::getNotices() .
 
-            '<form action="' . My::manageUrl(['part' => 'copy']) . '" method="post">' .
-            '<h3>' . $v->name . '</h3>' .
-            '<p><label for="filename" class="required"><abbr title="' . __('Required field') . '">*</abbr> ' . __('New filename:') . '</label> ' .
-            form::field('filename', 25, 255) . '<code>' . Html::escapeHTML('.html') . '</code></p> ' .
-            '<p class="form-note">' . sprintf(
-                __('To copy the template <strong>%s</strong>, you need to fill a new filename.'),
-                Html::escapeHTML($_REQUEST['file'])
-            ) . '</p>' .
-            '<p>' .
-            '<input type="submit" name="submit" value="' . __('Copy') . '" /> ' .
-            '<a class="button" href="' . My::manageUrl(['part' => 'files']) . '">' . __('Cancel') . '</a>' .
-            My::parsedHiddenFields(['file' => Html::escapeHTML($_REQUEST['file'])]) . '</p>' .
-            '</form>';
+            (new Form('copy-template'))
+                ->method('post')
+                ->action(My::manageUrl(['part' => 'copy']))
+                ->fields([
+                    (new Text('h3', $v->name)),
+                    (new Note())
+                        ->class('form-note')
+                        ->text(sprintf(__('Fields preceded by %s are mandatory.'), (new Text('span', '*'))->class('required')->render())),
+                    (new Para())->items([
+                        (new Label((new Text('span', '*'))->render() . __('Filename:')))
+                            ->class('required')
+                            ->for('filename'),
+                        (new Input('filename'))
+                            ->size(30)
+                            ->maxlength(255),
+                    ]),
+                    (new Note())
+                        ->class('form-note')
+                        ->text(sprintf(
+                            __('To copy the template <strong>%s</strong>, you need to fill a new filename.'),
+                            Html::escapeHTML($_REQUEST['file'])
+                        )),
+                    (new Para())
+                        ->separator(' ')
+                        ->items([
+                            ... My::hiddenFields(['file' => Html::escapeHTML($_REQUEST['file'])]),
+                            (new Submit(['submit'], __('Copy'))),
+                            (new Link())
+                                ->class('button')
+                                ->href(My::manageUrl(['part' => 'files']))
+                                ->text(__('Cancel')),
+                        ]),
+                ])
+                ->render();
 
             /*
              * Copy templator category template
@@ -239,19 +297,41 @@ class Manage extends Process
             ]) .
             Notices::getNotices() .
 
-            '<form action="' . My::manageUrl(['part' => 'copycat']) . '" method="post">' .
-            '<h3>' . $v->name . '</h3>' .
-            '<p><label for="filecat" class="required"><abbr title="' . __('Required field') . '">*</abbr> ' . __('Target category:') . '</label> ' .
-            form::combo('filecat', $v->categories, '') . '</p>' .
-            '<p class="form-note">' . sprintf(
-                __('To copy the template <strong>%s</strong> (%s), you need to choose a category.'),
-                Html::escapeHTML($_GET['file']),
-                $name
-            ) . '</p>' .
-            '<input type="submit" name="submit" value="' . __('Copy') . '" /> ' .
-            '<a class="button" href="' . My::manageUrl(['part' => 'files']) . '">' . __('Cancel') . '</a>' .
-            My::parsedHiddenFields(['file' => Html::escapeHTML($_REQUEST['file'])]) . '</p>' .
-            '</form>';
+            (new Form('copycat-template'))
+                ->method('post')
+                ->action(My::manageUrl(['part' => 'copycat']))
+                ->fields([
+                    (new Text('h3', $v->name)),
+                    (new Note())
+                        ->class('form-note')
+                        ->text(sprintf(__('Fields preceded by %s are mandatory.'), (new Text('span', '*'))->class('required')->render())),
+                    (new Para())
+                        ->items([
+                            (new Label((new Text('span', '*'))->render() . __('Target category:')))
+                                ->class('required')
+                                ->for('filecat'),
+                            (new Select('filecat'))
+                                ->items($v->categories()),
+                        ]),
+                    (new Note())
+                        ->class('form-note')
+                        ->text(sprintf(
+                            __('To copy the template <strong>%s</strong> (%s), you need to choose a category.'),
+                            Html::escapeHTML($_REQUEST['file']),
+                            $name
+                        )),
+                    (new Para())
+                        ->separator(' ')
+                        ->items([
+                            ... My::hiddenFields(['file' => Html::escapeHTML($_REQUEST['file'])]),
+                            (new Submit(['submit'], __('Copy'))),
+                            (new Link())
+                                ->class('button')
+                                ->href(My::manageUrl(['part' => 'files']))
+                                ->text(__('Cancel')),
+                        ]),
+                ])
+                ->render();
 
             /*
              * Delete templator template
@@ -266,16 +346,27 @@ class Manage extends Process
             ]) .
             Notices::getNotices() .
 
-            '<form action="' . My::manageUrl(['part' => 'delete']) . '" method="post">' .
-            '<h3>' . $v->name . '</h3>' .
-            '<p>' . sprintf(
-                __('Are you sure you want to remove the template "%s"?'),
-                Html::escapeHTML($_GET['file'])
-            ) . '</p>' .
-            '<p><input type="submit" class="delete" value="' . __('Delete') . '" /> ' .
-            '<a class="button" href="' . My::manageUrl(['part' => 'files']) . '">' . __('Cancel') . '</a>' .
-            My::parsedHiddenFields(['file' => Html::escapeHTML($_GET['file'])]) . '</p>' .
-            '</form>';
+            (new Form('delete-template'))
+                ->method('post')
+                ->action(My::manageUrl(['part' => 'delete']))
+                ->fields([
+                    (new Text('h3', $v->name)),
+                    (new Text('p', sprintf(
+                        __('Are you sure you want to remove the template "%s"?'),
+                        Html::escapeHTML($_GET['file'])
+                    ))),
+                    (new Para())
+                        ->separator(' ')
+                        ->items([
+                            ... My::hiddenFields(['file' => Html::escapeHTML($_REQUEST['file'])]),
+                            (new Submit(['submit'], __('Delete'))),
+                            (new Link())
+                                ->class(['button', 'delete'])
+                                ->href(My::manageUrl(['part' => 'files']))
+                                ->text(__('Cancel')),
+                        ]),
+                ])
+                ->render();
 
             /*
              * List templator templates
@@ -288,31 +379,37 @@ class Manage extends Process
                 My::name()    => My::manageUrl(),
                 $v->name      => '',
             ]) .
-            Notices::getNotices() .
-            '<h3>' . $v->name . '</h3>';
+            Notices::getNotices();
 
             if (count($v->items) == 0) {
-                echo '<p><strong>' . __('No template.') . '</strong></p>';
+                echo (new Div())
+                    ->items([
+                        (new Text('h3', $v->name)),
+                        (new Text('p', (new Text('strong', __('No template.')))->render())),
+                    ])
+                    ->render();
             } else {
                 // reuse "used templatro template" filter settings
                 $filter = new Filters(My::id());
                 $filter->add(FiltersLibrary::getPageFilter());
-                $page = is_numeric($filter->value('page')) ? (int) $filter->value('page') : 1;
-                $nb   = is_numeric($filter->value('nb')) ? (int) $filter->value('nb') : 1;
-
+                $page  = is_numeric($filter->value('page')) ? (int) $filter->value('page') : 1;
+                $nb    = is_numeric($filter->value('nb')) ? (int) $filter->value('nb') : 1;
                 $pager = new corePager($page, count($v->items), $nb, 10);
-
-                echo
-                '<div class="media-list">' .
-                $pager->getLinks();
+                $items = [];
 
                 for ($i = $pager->index_start, $j = 0; $i <= $pager->index_end; $i++, $j++) {
-                    echo Pager::line($v->items[$i], $j);
+                    $items[] = Pager::line($v->items[$i], $j);
                 }
 
-                echo
-                $pager->getLinks() .
-                '</div>';
+                echo (new Div())
+                    ->class('media-lsit')
+                    ->items([
+                        (new Text('h3', $v->name)),
+                        (new text(null, $pager->getLinks())),
+                        ... $items,
+                        (new text(null, $pager->getLinks())),
+                    ])
+                    ->render();
             }
 
             /*
@@ -582,35 +679,36 @@ class Manage extends Process
              * Default page
              */
         } else {
+
+            $links = [
+                 My::manageUrl(['part' => 'files']) => __('Available templates'),
+                 My::manageUrl(['part' => 'used']) => __('Used templates'),
+                 My::manageUrl(['part' => 'new']) => __('New template'),
+            ];
+
+            $lines = [];
+            foreach($links as $link => $title) {
+                $lines[] = (new Li())
+                    ->items([
+                        (new Link())
+                            ->href($link)
+                            ->text($title)
+                    ]);
+            }
+
             Page::openModule(My::name());
             echo
             Page::breadcrumb([
                 __('Plugins') => '',
                 My::name()    => '',
             ]) .
-            Notices::getNotices();
-
-            $line = '<li><a href="%s">%s</a></li>';
-            echo '
-            <h4><i>' . __('Create and select more templates for your posts') . '</i></h4>' .
-            sprintf(
-                '<h3><ul class="nice">%s</ul></h3>',
-                sprintf(
-                    $line,
-                    My::manageUrl(['part' => 'files']),
-                    __('Available templates')
-                ) .
-                sprintf(
-                    $line,
-                    My::manageUrl(['part' => 'used']),
-                    __('Used templates')
-                ) .
-                sprintf(
-                    $line,
-                    My::manageUrl(['part' => 'new']),
-                    __('New template')
-                )
-            );
+            Notices::getNotices() .
+            (new Div())
+                ->items([
+                    (new Text('h3', __('Create and select more templates for your posts'))),
+                    (new Ul())->class('nice')->items($lines),
+                ])
+                ->render();
         }
 
         Page::helpBlock('templator');

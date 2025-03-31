@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\templator;
 
 use Dotclear\App;
+use Dotclear\Helper\Html\Form\{
+    Div,
+    Text
+};
 use Dotclear\Helper\File\File;
 use Dotclear\Helper\File\Files;
 use Exception;
@@ -19,10 +23,10 @@ use Exception;
  */
 class Pager
 {
-    public static function line(File $f, int $i): string
+    public static function line(File $f, int $i): Div
     {
         if (!App::blog()->isDefined()) {
-            return '';
+            return (new Div());
         }
 
         $p_url       = App::backend()->getPageURL();
@@ -129,6 +133,6 @@ class Pager
 
         $res .= '</ul></div>';
 
-        return $res;
+        return (new Div())->items([(new Text('div', $res))]);
     }
 }

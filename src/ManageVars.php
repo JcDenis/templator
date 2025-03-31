@@ -159,6 +159,16 @@ class ManageVars
         return self::$container;
     }
 
+    /**
+     * The blog categories list (string version).
+     *
+     * @return  array<string, string>
+     */
+    public function categories(): array
+    {
+        return array_map(fn($v) => (string) $v, $this->categories);
+    }
+
     private function getPartName(string $part): string
     {
         $parts = [

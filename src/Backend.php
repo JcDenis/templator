@@ -19,6 +19,9 @@ class Backend extends Process
 {
     public static function init(): bool
     {
+        __('Templates engine');
+        __('Create and select more templates for your posts');
+
         return self::status(My::checkContext(My::BACKEND));
     }
 

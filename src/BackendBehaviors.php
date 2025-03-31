@@ -15,10 +15,18 @@ use Dotclear\Database\{
     Cursor,
     MetaRecord
 };
+use Dotclear\Helper\Html\Form\{
+    Div,
+    Form,
+    Hidden,
+    Label,
+    Para,
+    Select,
+    Submit,
+    Text
+};
 use Dotclear\Helper\Html\Html;
 use Exception;
-
-use form;
 
 /**
  * @brief       templator backend behaviors.
@@ -48,21 +56,28 @@ class BackendBehaviors
             $selected  = $post_meta->isEmpty() ? '' : $post_meta->f('meta_id');
         }
 
-        $sidebar_items['options-box']['items']['templator'] = '<div id="templator">' .
-            '<h5>' . __('Template') . '</h5>' .
-            '<p><label for="post_tpl">' . __('Select template:') . '</label>' .
-            form::combo('post_tpl', self::getTemplateCombo(), $selected) . '</p>' .
-            '</div>';
+        $sidebar_items['options-box']['items']['templator'] = (new Div())
+            ->items([
+                (new Text('h5', __('Template'))),
+                (new Para())
+                    ->items([
+                        (new Label(__('Select template:'), Label::OUTSIDE_LABEL_BEFORE))
+                            ->for(My::id() . 'post_tpl'),
+                        (new Select(My::id() . 'post_tpl'))
+                            ->items(self::getTemplateCombo())
+                            ->default($selected),
+                    ]),
+            ])->render();
     }
 
     public static function adminBeforePostUpdate(Cursor $cur, string|int $post_id): void
     {
         $post_id = (int) $post_id;
 
-        if (isset($_POST['post_tpl'])) {
+        if (isset($_POST[My::id() . 'post_tpl'])) {
             App::meta()->delPostMeta($post_id, 'template');
-            if (!empty($_POST['post_tpl'])) {
-                App::meta()->setPostMeta($post_id, 'template', $_POST['post_tpl']);
+            if (!empty($_POST[My::id() . 'post_tpl'])) {
+                App::meta()->setPostMeta($post_id, 'template', $_POST[My::id() . 'post_tpl']);
             }
         }
     }
@@ -116,19 +131,28 @@ class BackendBehaviors
             ])
         );
 
-        echo
-        '<h2 class="page-title">' . __('Select template for the selection') . '</h2>' .
-        '<form action="' . $pa->getURI() . '" method="post">' .
-        $pa->getCheckboxes() .
-        '<p><label class="classic">' . __('Select template:') . '</label> ' .
-        form::combo('post_tpl', self::getTemplateCombo()) . '</p>' .
-
-        '<p>' .
-        $pa->getHiddenFields() .
-        App::nonce()->getFormNonce() .
-        form::hidden(['action'], 'tpl') .
-        '<input type="submit" value="' . __('Save') . '" /></p>' .
-        '</form>';
+        echo (new Form())
+            ->action($pa->getURI())
+            ->method('post')
+            ->fields([
+                (new Text('h2', __('Select template for the selection')))
+                    ->class('page-title'),
+                $pa->checkboxes(),
+                (new Para())
+                    ->items([
+                        (new Label(__('Select template:'), Label::OUTSIDE_LABEL_BEFORE))
+                            ->for(My::id() . 'post_tpl'),
+                        (new Select(My::id() . 'post_tpl'))
+                            ->items(self::getTemplateCombo()),
+                    ]),
+                (new Para())
+                    ->items([
+                        ... $pa->hiddenFields(),
+                        App::nonce()->formNonce(),
+                        (new Hidden(['action'], 'tpl')),
+                        (new Submit(['submit', __('Save')])),
+                    ]),
+            ])->render();
 
         $pa->endPage();
     }
@@ -147,7 +171,7 @@ class BackendBehaviors
             ],
             'post_upddt',
             'desc',
-            [__('Entries per page'), 30],
+            [__('Templates per page'), 30],
         ];
     }
 
