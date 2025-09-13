@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\templator;
 
 use Dotclear\App;
-use Dotclear\Core\Process;
+use Dotclear\Helper\Process\TraitProcess;
 
 /**
  * @brief       templator backend class.
@@ -15,8 +15,10 @@ use Dotclear\Core\Process;
  * @author      Jean-Christian Denis (latest)
  * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-class Backend extends Process
+class Backend
 {
+    use TraitProcess;
+
     public static function init(): bool
     {
         __('Templates engine');

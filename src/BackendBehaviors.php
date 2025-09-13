@@ -7,24 +7,18 @@ namespace Dotclear\Plugin\templator;
 use ArrayObject;
 use Dotclear\App;
 use Dotclear\Core\Backend\Action\ActionsPosts;
-use Dotclear\Core\Backend\{
-    Notices,
-    Page
-};
-use Dotclear\Database\{
-    Cursor,
-    MetaRecord
-};
-use Dotclear\Helper\Html\Form\{
-    Div,
-    Form,
-    Hidden,
-    Label,
-    Para,
-    Select,
-    Submit,
-    Text
-};
+use Dotclear\Core\Backend\Notices;
+use Dotclear\Core\Backend\Page;
+use Dotclear\Database\Cursor;
+use Dotclear\Database\MetaRecord;
+use Dotclear\Helper\Html\Form\Div;
+use Dotclear\Helper\Html\Form\Form;
+use Dotclear\Helper\Html\Form\Hidden;
+use Dotclear\Helper\Html\Form\Label;
+use Dotclear\Helper\Html\Form\Para;
+use Dotclear\Helper\Html\Form\Select;
+use Dotclear\Helper\Html\Form\Submit;
+use Dotclear\Helper\Html\Form\Text;
 use Dotclear\Helper\Html\Html;
 use Exception;
 

@@ -5,39 +5,34 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\templator;
 
 use Dotclear\App;
-use Dotclear\Core\Backend\Filter\{
-    Filters,
-    FiltersLibrary
-};
+use Dotclear\Core\Backend\Filter\Filters;
+use Dotclear\Core\Backend\Filter\FiltersLibrary;
 use Dotclear\Core\Backend\Listing\ListingPosts;
 use Dotclear\Core\Backend\Listing\Pager as corePager;
-use Dotclear\Core\Backend\{
-    Notices,
-    Page
-};
-use Dotclear\Core\Process;
+use Dotclear\Core\Backend\Notices;
+use Dotclear\Core\Backend\Page;
+use Dotclear\Helper\Process\TraitProcess;
 use Dotclear\Helper\File\Files;
-use Dotclear\Helper\Html\Form\{
-    Div,
-    Form,
-    Input,
-    Label,
-    Li,
-    Link,
-    Note,
-    None,
-    Ul,
-    Para,
-    Select,
-    Submit,
-    Text
-};
+use Dotclear\Helper\Html\Form\Div;
+use Dotclear\Helper\Html\Form\Form;
+use Dotclear\Helper\Html\Form\Hidden;
+use Dotclear\Helper\Html\Form\Input;
+use Dotclear\Helper\Html\Form\Label;
+use Dotclear\Helper\Html\Form\Li;
+use Dotclear\Helper\Html\Form\Link;
+use Dotclear\Helper\Html\Form\Note;
+use Dotclear\Helper\Html\Form\None;
+use Dotclear\Helper\Html\Form\Ul;
+use Dotclear\Helper\Html\Form\Para;
+use Dotclear\Helper\Html\Form\Select;
+use Dotclear\Helper\Html\Form\Set;
+use Dotclear\Helper\Html\Form\Submit;
+use Dotclear\Helper\Html\Form\Text;
+use Dotclear\Helper\Html\Form\Textarea;
 use Dotclear\Helper\Html\Html;
 use Dotclear\Plugin\themeEditor\My as themeEditorMy;
 use Dotclear\Plugin\tags\My as tagsMy;
 use Exception;
-
-//use form;
 
 /**
  * @brief       templator manage class.
@@ -47,8 +42,10 @@ use Exception;
  * @author      Jean-Christian Denis (latest)
  * @copyright   GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-class Manage extends Process
+class Manage
 {
+    use TraitProcess;
+
     public static function init(): bool
     {
         return self::status(My::checkContext(My::MANAGE));
@@ -550,28 +547,44 @@ class Manage extends Process
             ]) .
             Notices::getNotices();
 
+            $more = $file['w'] ?
+                (new Para())
+                    ->separator(' ')
+                    ->items([
+                        (new Submit('write'))
+                            ->value(__('Save'))
+                            ->accesskey('s'),
+                        (new Link())
+                            ->class('button')
+                            ->href(My::manageUrl(['part' => 'files']))
+                            ->text(__('Cancel')),
+                        ... My::hiddenFields(['file_id' => Html::escapeHTML($file['f'])]),
+                    ])
+                :
+                new Text('p', __('This file is not writable. Please check your files permissions.'));
+
             if (($file['c'] !== null)) {
-                echo
-                '<form id="file-form" action="' . My::manageUrl(['part' => 'edit', 'file' => $name]) . '" method="post">' .
-                '<div><h3><label for="file_content">' . sprintf(__('Editing file %s'), '<strong>' . $name) . '</strong></label></h3>' .
-                '<p>' . form::textarea('file_content', 72, 25, [
-                    'default'  => Html::escapeHTML($file['c']),
-                    'class'    => 'maximal',
-                    'disabled' => !$file['w'],
-                ]) . '</p>';
+                echo (new Form('file-form'))
+                    ->method('post')
+                    ->action(My::manageUrl(['part' => 'edit', 'file' => $name]))
+                    ->fields([
+                        (new Div())
+                            ->items([
+                                (new Para())
+                                    ->items([
+                                        (new Textarea('file_content'))
+                                            ->class('maximal')
+                                            ->readonly(!$file['w'])
+                                            ->cols(72)
+                                            ->rows(25)
+                                            ->label((new Label(sprintf(__('Editing file %s'), '<strong>' . $name), Label::OL_TF)))
+                                            ->value(Html::escapeHTML($file['c'])),
+                                    ]),
+                                    $more,
+                            ]),
+                    ])
+                    ->render();
 
-                if ($file['w']) {
-                    echo
-                    '<p><input type="submit" name="write" value="' . __('Save') . '" accesskey="s" /> ' .
-                    '<a class="button" href="' . My::manageUrl(['part' => 'files']) . '">' . __('Cancel') . '</a>' .
-                    My::parsedHiddenFields(['file_id' => Html::escapeHTML($file['f'])]) .
-                    '</p>';
-                } else {
-                    echo '<p>' . __('This file is not writable. Please check your files permissions.') . '</p>';
-                }
-
-                echo
-                '</div></form>';
                 if (App::auth()->prefs()->get('interface')->get('colorsyntax')) {
                     $ict = App::auth()->prefs()->get('interface')->get('colorsyntax_theme');
                     echo
@@ -636,40 +649,64 @@ class Manage extends Process
                 My::name()    => My::manageUrl(),
                 $v->name      => '',
             ]) .
-            Notices::getNotices() .
+            Notices::getNotices();
 
-            '<h3>' . sprintf(__('Unselect template "%s"'), '<strong>' . $file . '</strong>') . '</h3>' .
-            '<p><a class ="back" href="' . $redir . '">' . __('Back') . '</a></p>';
+            echo (new Set())
+                ->items([
+                    (new Text('h3', sprintf(__('Unselect template "%s"'), (new Text('strong', $file))->render()))),
+                    (new Para())
+                        ->items([
+                            (new Link())
+                                ->class('back')
+                                ->href($redir)
+                                ->text(__('Back')),
+                        ]),
+                ])
+                ->render();
 
             if (!App::error()->flag() && isset($posts) && isset($post_list)) {
                 if ($posts->isEmpty() && !$filter->show()) {
-                    echo '<p>' . __('There is no entries') . '</p>';
+                    echo (new Text('p', __('There is no entries')))->render();
                 } else {
                     $page = is_numeric($filter->value('page')) ? (int) $filter->value('page') : 1;
                     $nb   = is_numeric($filter->value('nb')) ? (int) $filter->value('nb') : 0;
                     $filter->display(
                         'admin.plugin.' . My::id(),
-                        form::hidden('p', 'templator') . form::hidden('part', 'posts') . form::hidden('file', $file)
+                        (new Set())
+                            ->items([
+                                new Hidden('p', 'templator'),
+                                new Hidden('part', 'posts'),
+                                new Hidden('file', $file),
+                            ])
+                            ->render()
                     );
                     # Show posts
                     $post_list->display(
                         $page,
                         $nb,
-                        '<form action="' . My::manageUrl() . '" method="post" id="form-entries">' .
-
-                        '%s' .
-
-                        '<div class="two-cols">' .
-                        '<p class="col checkboxes-helpers"></p>' .
-
-                        '<p class="col right">' .
-                         '<input type="submit" value="' . __('Unselect template for selected entries') . '" /></p>' .
-                        form::hidden('action', 'unselecttpl') .
-                        App::backend()->url()->getHiddenFormFields('admin.plugin.' . My::id(), $filter->values()) .
-                        form::hidden('redir', $redir) .
-                        App::nonce()->getFormNonce() .
-                        '</div>' .
-                        '</form>',
+                        (new Form('form-entries'))
+                            ->method('post')
+                            ->action(My::manageUrl())
+                            ->fields([
+                                new Text('', '%s'),
+                                (new Div())
+                                    ->class('two-cols')
+                                    ->items([
+                                        (new Para())
+                                            ->class('col checkboxes-helpers'),
+                                        (new Para())
+                                            ->class('col right')
+                                            ->separator('&nbsp;')
+                                            ->items([
+                                                (new Submit('do-action'))
+                                                    ->value(__('Unselect template for selected entries')),
+                                                new Hidden('action', 'unselecttpl'),
+                                                new Hidden('redir', $redir),
+                                                ... My::hiddenFields($filter->values()),
+                                            ]),
+                                    ])
+                            ])
+                            ->render(),
                         $filter->show()
                     );
                 }

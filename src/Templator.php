@@ -52,7 +52,7 @@ class Templator
     public const DEFAULT_TPL_CATEGORY = 'category.html';
 
     /** @var    Templator    Self instance */
-    private static $instance;
+    private static Templator $instance;
 
     /** @var    string  $path   This plugin templates directory path */
     private string $path = '';
@@ -101,7 +101,7 @@ class Templator
 
     public static function instance(): Templator
     {
-        if (!(self::$instance instanceof Templator)) {
+        if (!isset(self::$instance)) {
             self::$instance = new Templator();
         }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\templator;
 
 use Dotclear\App;
-use Dotclear\Helper\File\File;
+use Dotclear\Helper\File\MediaFile;
 use Dotclear\Helper\Html\Html;
 use Dotclear\Interface\Core\MediaInterface;
 use Dotclear\Plugin\pages\Pages;
@@ -24,9 +24,9 @@ class ManageVars
     /**
      * Self instance.
      *
-     * @var     ManageVars  $container
+     * @var     ManageVars  $instance
      */
-    private static $container;
+    private static ManageVars $instance;
 
     /**
      * The requested manage part name.
@@ -52,7 +52,7 @@ class ManageVars
     /**
      * The media items.
      *
-     * @var     array<int, File>    $items
+     * @var     array<int, MediaFile>    $items
      */
     public readonly array $items;
 
@@ -152,11 +152,11 @@ class ManageVars
      */
     public static function instance(): ManageVars
     {
-        if (!(self::$container instanceof self)) {
-            self::$container = new self();
+        if (!isset(self::$instance)) {
+            self::$instance = new self();
         }
 
-        return self::$container;
+        return self::$instance;
     }
 
     /**

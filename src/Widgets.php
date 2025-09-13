@@ -48,7 +48,7 @@ class Widgets
 
     public static function getDataTpl(WidgetsElement $w): string
     {
-        return is_string($w->__get('template')) && App::frontend()->template()->getFilePath($w->__get('template')) ?
-            App::frontend()->template()->getData($w->__get('template')) : '';
+        return is_string($w->get('template')) && App::frontend()->template()->getFilePath($w->get('template')) ?
+            App::frontend()->template()->getData($w->get('template')) : '';
     }
 }
