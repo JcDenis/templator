@@ -14,6 +14,10 @@
  */
 declare(strict_types=1);
 
+if (!isset($this) || !is_object($this) || !method_exists($this, 'registerModule') || !isset($this->id) || !is_string($this->id)) {
+    return;
+}
+
 $this->registerModule(
     'Templates engine',
     'Create and select more templates for your posts',
@@ -21,7 +25,7 @@ $this->registerModule(
     '1.9',
     [
         'requires'    => [
-            ['core', '2.36'],
+            ['core', '2.39'],
             ['tags', '2.0'],
             ['themeEditor', '2.0'],
         ],
