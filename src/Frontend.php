@@ -36,7 +36,7 @@ class Frontend
         App::behavior()->addBehaviors([
             'urlHandlerBeforeGetData' => function ($_): void {
                 if ((App::frontend()->context()->__get('posts') instanceof MetaRecord)
-                    && (array_key_exists(App::url()->type, App::postTypes()->getPostTypes()) || App::url()->type == 'pages')) {
+                    && (array_key_exists(App::url()->getType(), App::postTypes()->getPostTypes()) || App::url()->getType() == 'pages')) {
                     $params              = [];
                     $params['meta_type'] = 'template';
                     $params['post_id']   = App::frontend()->context()->__get('posts')->f('post_id');

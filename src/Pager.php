@@ -45,9 +45,9 @@ class Pager
             $full_name   = '';
             $cat_parents = App::blog()->getCategoryParents($cat_id);
             while ($cat_parents->fetch()) {
-                $full_name = $cat_parents->f('cat_title') . ' &rsaquo; ';
+                $full_name .= $cat_parents->strField('cat_title') . ' &rsaquo; ';
             };
-            $fname               = '<strong>' . __('Category') . '</strong> :&nbsp;' . $full_name . $category->f('cat_title');
+            $fname               = '<strong>' . __('Category') . '</strong> :&nbsp;' . $full_name . $category->strField('cat_title');
             $params['cat_id']    = $cat_id;
             $params['post_type'] = '';
             $icon                = My::fileURL('img/template-alt.png');
@@ -55,12 +55,14 @@ class Pager
 
             try {
                 $counter = App::blog()->getPosts($params, true);
-                if ($counter->f(0) == 0) {
+                $nb  = $counter->intField(0);
+                $url = App::backend()->url()->get('admin.posts', ['cat_id' => $cat_id]);
+                if ($nb === 0) {
                     $count = __('No entry');
-                } elseif ($counter->f(0) == 1) {
-                    $count = '<strong>' . $counter->f(0) . '</strong> <a href="posts.php?cat_id=' . $cat_id . '">' . __('entry') . '</a>';
+                } elseif ($nb === 1) {
+                    $count = '<strong>' . $nb . '</strong> <a href="' . $url . '">' . __('entry') . '</a>';
                 } else {
-                    $count = '<strong>' . $counter->f(0) . '</strong> <a href="posts.php?cat_id=' . $cat_id . '">' . __('entries') . '</a>';
+                    $count = '<strong>' . $nb . '</strong> <a href="' . $url . '">' . __('entries') . '</a>';
                 }
             } catch (Exception $e) {
                 App::error()->add($e->getMessage());

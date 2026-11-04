@@ -79,6 +79,7 @@ class Templator
         }
 
         $page_root = App::plugins()->getDefine('pages')->get('root');
+        $page_root = is_string($page_root) ? $page_root : '';
 
         // Initial templates
         $this->path              = implode(DIRECTORY_SEPARATOR, [App::blog()->publicPath(), self::MY_TPL_DIR]);
@@ -87,7 +88,7 @@ class Templator
         $this->file_tpl_page     = Path::real(implode(DIRECTORY_SEPARATOR, [$page_root, self::DC_TPL_DIR, self::DEFAULT_TPLSET, self::DEFAULT_TPL_PAGE])) ?: '';
 
         // user templates
-        $this->user_path_theme   = App::blog()->themesPath() . DIRECTORY_SEPARATOR . App::blog()->settings()->get('system')->get('theme');
+        $this->user_path_theme   = App::blog()->themesPath() . DIRECTORY_SEPARATOR . App::blog()->settings()->get('system')->getStr('theme', false);
         $this->user_tpl_post     = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_POST])) ?: '';
         $this->user_tpl_category = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_CATEGORY])) ?: '';
         $this->user_tpl_page     = Path::real(implode(DIRECTORY_SEPARATOR, [$this->user_path_theme, self::THEME_TPL_DIR, self::DEFAULT_TPL_PAGE])) ?: '';

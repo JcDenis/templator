@@ -83,9 +83,10 @@ class ManageVars
     public function __construct()
     {
         // manage page
-        $name       = $this->getPartName(($_REQUEST['part'] ?? ''));
+        $part       = is_string($_REQUEST['part'] ?? null) ? $_REQUEST['part'] : '';
+        $name       = $this->getPartName($part);
         $this->name = empty($name) ? __('Home') : $name;
-        $this->part = empty($name) ? '' : $_REQUEST['part'];
+        $this->part = empty($name) ? '' : $part;
 
         // Extend dcMedia to change settings to allow .html vs media_exclusion
         $this->media = clone App::media();

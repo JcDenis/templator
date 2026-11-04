@@ -38,16 +38,23 @@ class BackendBehaviors
     }
 
     /**
-     * @param   ArrayObject<string, mixed>  $main_items
-     * @param   ArrayObject<string, mixed>  $sidebar_items
+     * @param   ArrayObject<string, mixed>                  $main_items
+     * @param   ArrayObject<string, array<string, mixed>>   $sidebar_items
      */
     public static function adminPostFormItems(ArrayObject $main_items, ArrayObject $sidebar_items, ?MetaRecord $post): void
     {
         $selected = '';
 
         if (!is_null($post)) {
-            $post_meta = App::meta()->getMetadata(['meta_type' => 'template', 'post_id' => $post->f('post_id'), 'post_type' => $post->post_type]);
-            $selected  = $post_meta->isEmpty() ? '' : $post_meta->f('meta_id');
+            $post_meta = App::meta()->getMetadata(['meta_type' => 'template', 'post_id' => $post->intField('post_id'), 'post_type' => $post->strField('post_type')]);
+            $selected  = $post_meta->isEmpty() ? '' : $post_meta->strField('meta_id');
+        }
+
+        if (!isset($sidebar_items['options-box'])) {
+            $sidebar_items['options-box'] = [];
+        }
+        if (!isset($sidebar_items['options-box']['items']) || !is_array($sidebar_items['options-box']['items'])) {
+            $sidebar_items['options-box']['items'] = [];
         }
 
         $sidebar_items['options-box']['items']['templator'] = (new Div())
@@ -70,8 +77,9 @@ class BackendBehaviors
 
         if (isset($_POST[My::id() . 'post_tpl'])) {
             App::meta()->delPostMeta($post_id, 'template');
-            if (!empty($_POST[My::id() . 'post_tpl'])) {
-                App::meta()->setPostMeta($post_id, 'template', $_POST[My::id() . 'post_tpl']);
+            $tpl = $_POST[My::id() . 'post_tpl'];
+            if (is_string($tpl) && $tpl !== '') {
+                App::meta()->setPostMeta($post_id, 'template', $tpl);
             }
         }
     }

@@ -66,14 +66,14 @@ class Manage
          */
         if ('new' == $v->part && !empty($_POST['filesource'])) {
             try {
-                if ('category' == $_POST['filesource']) {
-                    $name = 'category-' . $_POST['filecat'] . '.html';
+                if ('category' == self::post('filesource')) {
+                    $name = 'category-' . self::post('filecat') . '.html';
                 } elseif (!empty($_POST['filename'])) {
-                    $name = Files::tidyFileName($_POST['filename']) . '.html';
+                    $name = Files::tidyFileName(self::post('filename')) . '.html';
                 } else {
                     throw new Exception(__('Filename is empty.'));
                 }
-                $t->initializeTpl($name, $_POST['filesource']);
+                $t->initializeTpl($name, self::post('filesource'));
 
                 if (!App::error()->flag()) {
                     Notices::addSuccessNotice(__('The new template has been successfully created.'));
@@ -90,8 +90,8 @@ class Manage
         if ('copy' == $v->part && !empty($_POST['filename'])) {
             try {
                 $t->copypasteTpl(
-                    rawurldecode($_POST['filename']) . '.html',
-                    rawurldecode($_POST['file'])
+                    rawurldecode(self::post('filename')) . '.html',
+                    rawurldecode(self::post('file'))
                 );
 
                 if (!App::error()->flag()) {
@@ -109,8 +109,8 @@ class Manage
         if ('copycat' == $v->part && !empty($_POST['filecat'])) {
             try {
                 $t->copypasteTpl(
-                    'category-' . rawurldecode($_POST['filecat']) . '.html',
-                    rawurldecode($_POST['file'])
+                    'category-' . rawurldecode(self::post('filecat')) . '.html',
+                    rawurldecode(self::post('file'))
                 );
 
                 if (!App::error()->flag()) {
@@ -127,7 +127,7 @@ class Manage
          */
         if ('delete' == $v->part && !empty($_POST['file'])) {
             try {
-                $file = rawurldecode($_POST['file']);
+                $file = rawurldecode(self::post('file'));
                 $v->media->removeItem($file);
                 App::meta()->delMeta($file, 'template');
 
@@ -258,12 +258,12 @@ class Manage
                         ->class('form-note')
                         ->text(sprintf(
                             __('To copy the template <strong>%s</strong>, you need to fill a new filename.'),
-                            Html::escapeHTML($_REQUEST['file'])
+                            Html::escapeHTML(self::request('file'))
                         )),
                     (new Para())
                         ->separator(' ')
                         ->items([
-                            ... My::hiddenFields(['file' => Html::escapeHTML($_REQUEST['file'])]),
+                            ... My::hiddenFields(['file' => Html::escapeHTML(self::request('file'))]),
                             (new Submit(['submit'], __('Copy'))),
                             (new Link())
                                 ->class('button')
@@ -277,13 +277,13 @@ class Manage
              * Copy templator category template
              */
         } elseif ('copycat' == $v->part && !empty($_REQUEST['file'])) {
-            $category_id = (int) str_replace(['category-','.html'], '', $_REQUEST['file']);
+            $category_id = (int) str_replace(['category-','.html'], '', self::request('file'));
             $cat_parents = App::blog()->getCategoryParents($category_id);
             $full_name   = '';
             while ($cat_parents->fetch()) {
-                $full_name = $cat_parents->f('cat_title') . ' &rsaquo; ';
+                $full_name .= $cat_parents->strField('cat_title') . ' &rsaquo; ';
             };
-            $name = $full_name . App::blog()->getCategory($category_id)->f('cat_title');
+            $name = $full_name . App::blog()->getCategory($category_id)->strField('cat_title');
 
             Page::openModule(My::name());
             echo
@@ -314,13 +314,13 @@ class Manage
                         ->class('form-note')
                         ->text(sprintf(
                             __('To copy the template <strong>%s</strong> (%s), you need to choose a category.'),
-                            Html::escapeHTML($_REQUEST['file']),
+                            Html::escapeHTML(self::request('file')),
                             $name
                         )),
                     (new Para())
                         ->separator(' ')
                         ->items([
-                            ... My::hiddenFields(['file' => Html::escapeHTML($_REQUEST['file'])]),
+                            ... My::hiddenFields(['file' => Html::escapeHTML(self::request('file'))]),
                             (new Submit(['submit'], __('Copy'))),
                             (new Link())
                                 ->class('button')
@@ -350,12 +350,12 @@ class Manage
                     (new Text('h3', $v->name)),
                     (new Text('p', sprintf(
                         __('Are you sure you want to remove the template "%s"?'),
-                        Html::escapeHTML($_GET['file'])
+                        Html::escapeHTML(self::request('file'))
                     ))),
                     (new Para())
                         ->separator(' ')
                         ->items([
-                            ... My::hiddenFields(['file' => Html::escapeHTML($_REQUEST['file'])]),
+                            ... My::hiddenFields(['file' => Html::escapeHTML(self::request('file'))]),
                             (new Submit(['submit'], __('Delete'))),
                             (new Link())
                                 ->class(['button', 'delete'])
@@ -489,7 +489,7 @@ class Manage
 
             try {
                 try {
-                    $name = rawurldecode($_REQUEST['file']);
+                    $name = rawurldecode(self::request('file'));
                     $file = $t->getSourceContent($name);
                     $name = $file['f'];
 
@@ -498,9 +498,9 @@ class Manage
                         $full_name   = '';
                         $cat_parents = App::blog()->getCategoryParents((int) $cat_id[1]);
                         while ($cat_parents->fetch()) {
-                            $full_name = $cat_parents->f('cat_title') . ' &rsaquo; ';
+                            $full_name .= $cat_parents->strField('cat_title') . ' &rsaquo; ';
                         };
-                        $name .= '</strong> (' . $full_name . $category->f('cat_title') . ')<strong>';
+                        $name .= '</strong> (' . $full_name . $category->strField('cat_title') . ')<strong>';
                     }
                 } catch (Exception $e) {
                     $file['c'] = null;
@@ -509,7 +509,7 @@ class Manage
                 }
                 # Write file
                 if (!empty($_POST['write'])) {
-                    $file['c'] = $_POST['file_content'] ?? null;
+                    $file['c'] = self::post('file_content');
                     $t->writeTpl($file['f'], $file['c']);
                 }
             } catch (Exception $e) {
@@ -597,12 +597,12 @@ class Manage
             /*
              * Edit posts options linked to a template
              */
-        } elseif ('posts' == $v->part && (!empty($_REQUEST['file']) || $_REQUEST['file'] == '0')) {
-            $file  = $_REQUEST['file'];
-            $redir = $_REQUEST['redir'] ?? My::manageUrl(['part' => 'used']);
+        } elseif ('posts' == $v->part && self::request('file') !== '') {
+            $file  = self::request('file');
+            $redir = self::request('redir') ?: My::manageUrl(['part' => 'used']);
 
             # Unselect the template
-            if (!empty($_POST['action']) && 'unselecttpl' == $_POST['action'] && App::auth()->check(App::auth()->makePermissions([
+            if (!empty($_POST['action']) && 'unselecttpl' == self::post('action') && App::auth()->check(App::auth()->makePermissions([
                 App::auth()::PERMISSION_PUBLISH,
                 App::auth()::PERMISSION_CONTENT_ADMIN,
             ]), App::blog()->id())) {
@@ -702,7 +702,7 @@ class Manage
                                                     ->value(__('Unselect template for selected entries')),
                                                 new Hidden('action', 'unselecttpl'),
                                                 new Hidden('redir', $redir),
-                                                ... My::hiddenFields($filter->values()),
+                                                ... My::hiddenFields(array_filter($filter->values(), fn ($v): bool => is_string($v) || is_int($v))),
                                             ]),
                                     ])
                             ])
@@ -751,5 +751,21 @@ class Manage
         Page::helpBlock('templator');
 
         Page::closeModule();
+    }
+
+    /**
+     * Get a string from POST.
+     */
+    private static function post(string $key): string
+    {
+        return isset($_POST[$key]) && is_string($_POST[$key]) ? $_POST[$key] : '';
+    }
+
+    /**
+     * Get a string from REQUEST.
+     */
+    private static function request(string $key): string
+    {
+        return isset($_REQUEST[$key]) && is_string($_REQUEST[$key]) ? $_REQUEST[$key] : '';
     }
 }
