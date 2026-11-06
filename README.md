@@ -43,5 +43,6 @@ Note: Remove all reference to __.html__ from about:config => system => media_exc
 
 * Osku (author)
 * Jean-Christian Denis (latest)
+* Claude (AI assistant by Anthropic)
 
 You are welcome to contribute to this code.
