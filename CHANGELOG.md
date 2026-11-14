@@ -1,7 +1,5 @@
 templator 1.11 - 2026.11.14
 ===========================================================
-* Fix DA URLs
-* Add Claude to contributors
 * Fix saving category templates
 * Fix entries template action
 * Fix category templates on SQLite
