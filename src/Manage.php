@@ -192,7 +192,7 @@ class Manage
                         ->text(sprintf(__('Fields preceded by %s are mandatory.'), (new Text('span', '*'))->class('required')->render())),
                     (new Para())
                         ->items([
-                            (new Label((new Text('span', '*'))->render() . __('Title:')))
+                            (new Label((new Text('span', '*'))->render() . __('Source template:')))
                                 ->class('required')
                                 ->for('filesource'),
                             (new Select('filesource'))
@@ -491,7 +491,8 @@ class Manage
                 try {
                     $name = rawurldecode(self::request('file'));
                     $file = $t->getSourceContent($name);
-                    $name = $file['f'];
+                    $name  = $file['f'];
+                    $label = '<strong>' . Html::escapeHTML($name) . '</strong>';
 
                     if (preg_match('/^category-(.+).html$/', $name, $cat_id)) {
                         $category    = App::blog()->getCategory((int) $cat_id[1]);
@@ -500,7 +501,7 @@ class Manage
                         while ($cat_parents->fetch()) {
                             $full_name .= $cat_parents->strField('cat_title') . ' &rsaquo; ';
                         };
-                        $name .= '</strong> (' . $full_name . $category->strField('cat_title') . ')<strong>';
+                        $label .= ' (' . Html::escapeHTML($full_name . $category->strField('cat_title')) . ')';
                     }
                 } catch (Exception $e) {
                     $file['c'] = null;
@@ -577,7 +578,7 @@ class Manage
                                             ->readonly(!$file['w'])
                                             ->cols(72)
                                             ->rows(25)
-                                            ->label((new Label(sprintf(__('Editing file %s'), '<strong>' . $name), Label::OL_TF)))
+                                            ->label((new Label(sprintf(__('Editing file %s'), $label ?? ''), Label::OL_TF)))
                                             ->value(Html::escapeHTML($file['c'])),
                                     ]),
                                     $more,
