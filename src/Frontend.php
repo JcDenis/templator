@@ -50,10 +50,9 @@ class Frontend
 
                 if (App::frontend()->context()->__get('current_tpl') == 'category.html'
                     && (App::frontend()->context()->__get('categories') instanceof MetaRecord)
-                    && is_string(App::frontend()->context()->__get('categories')->f('cat_id'))
-                    && preg_match('/^[0-9]{1,}/', App::frontend()->context()->__get('categories')->f('cat_id'), $cat_id)
+                    && App::frontend()->context()->__get('categories')->intField('cat_id') > 0
                 ) {
-                    $tpl = 'category-' . $cat_id[0] . '.html';
+                    $tpl = 'category-' . App::frontend()->context()->__get('categories')->intField('cat_id') . '.html';
                     if (App::frontend()->template()->getFilePath($tpl)) {
                         App::frontend()->context()->__set('current_tpl', $tpl);
                     }
