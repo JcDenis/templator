@@ -109,12 +109,12 @@ class BackendBehaviors
             return;
         }
 
-        if (isset($post['post_tpl']) && is_string($post['post_tpl'])) {
+        if (isset($post[My::id() . 'post_tpl']) && is_string($post[My::id() . 'post_tpl'])) {
             try {
                 foreach ($posts_ids as $post_id) {
                     App::meta()->delPostMeta($post_id, 'template');
-                    if (!empty($post['post_tpl'])) {
-                        App::meta()->setPostMeta($post_id, 'template', $post['post_tpl']);
+                    if (!empty($post[My::id() . 'post_tpl'])) {
+                        App::meta()->setPostMeta($post_id, 'template', $post[My::id() . 'post_tpl']);
                     }
                 }
 
@@ -133,7 +133,7 @@ class BackendBehaviors
             ])
         );
 
-        echo (new Form())
+        echo (new Form(My::id() . '_tpl_form'))
             ->action($pa->getURI())
             ->method('post')
             ->fields([
@@ -152,7 +152,7 @@ class BackendBehaviors
                         ... $pa->hiddenFields(),
                         App::nonce()->formNonce(),
                         (new Hidden(['action'], 'tpl')),
-                        (new Submit(['submit', __('Save')])),
+                        (new Submit(['submit'], __('Save'))),
                     ]),
             ])->render();
 
