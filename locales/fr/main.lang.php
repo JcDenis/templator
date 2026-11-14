@@ -1,11 +1,12 @@
 <?php
-// Language: Français
-// Module: templator - 1.8.4
-// Date: 2025-03-31 14:45:33
-// Author: , contact@jcdenis.fr
-// Translated with Translater - 2025.03.03
+declare(strict_types=1);
 
-
+/**
+ * @package Dotclear
+ *
+ * @copyright Olivier Meunier & Association Dotclear
+ * @copyright GPL-2.0-only
+ */
 #
 # DOT NOT MODIFY THIS FILE !
 #
@@ -23,7 +24,7 @@ L10n::$locales['Select template for the selection'] = 'Sélectionner le template
 L10n::$locales['Templates per page'] = 'Templates par page';
 L10n::$locales['No specific template'] = 'Aucun template additionnel';
 L10n::$locales['Filename is empty.'] = 'Le nom de fichier est vide.';
-L10n::$locales['The new template has been successfully created.'] = 'Un noueau template a été créé avec succès.';
+L10n::$locales['The new template has been successfully created.'] = 'Un nouveau template a été créé avec succès.';
 L10n::$locales['The template has been successfully copied.'] = 'Le template a été copié avec succès.';
 L10n::$locales['The template has been successfully removed.'] = 'Le template a été supprimé avec succès.';
 L10n::$locales['The plugin is unusable with your configuration. You have to change file permissions.'] = 'L\'extension est inutilisable avec votre configuration. Vous devez modifier les permissions des fichiers.';
@@ -58,3 +59,4 @@ L10n::$locales['copy'] = 'copier';
 L10n::$locales['copy the template'] = 'copier le template';
 L10n::$locales['delete the template'] = 'supprimer le template';
 L10n::$locales['manage templates'] = 'gérer les templates';
+L10n::$locales['Source template:'] = 'Template source :';

@@ -64,7 +64,7 @@ msgstr "Le nom de fichier est vide."
 
 #: src/Manage.php:82
 msgid "The new template has been successfully created."
-msgstr "Un noueau template a été créé avec succès."
+msgstr "Un nouveau template a été créé avec succès."
 
 #: src/Manage.php:101
 msgid "The template has been successfully copied."
@@ -205,3 +205,5 @@ msgstr "supprimer le template"
 msgid "manage templates"
 msgstr "gérer les templates"
 
+msgid "Source template:"
+msgstr "Template source :"
