@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\templator;
 
 use Dotclear\App;
+use Dotclear\Helper\File\Manager;
 use Dotclear\Helper\File\MediaFile;
 use Dotclear\Helper\Html\Html;
 use Dotclear\Interface\Core\MediaInterface;
@@ -88,9 +89,15 @@ class ManageVars
         $this->name = empty($name) ? __('Home') : $name;
         $this->part = empty($name) ? '' : $part;
 
-        // Extend dcMedia to change settings to allow .html vs media_exclusion
-        $this->media = clone App::media();
-        $this->media->setExcludePattern('/^((?!.html).)*$/i');
+        // Copy media manager to allow only .html files, whatever the blog media_exclusion setting
+        $media = clone App::media();
+        if ($media instanceof Manager) {
+            (function (): void {
+                $this->exclude_pattern_list = [];
+            })->call($media);
+            $media->addExcludePattern('/^((?!.html).)*$/i');
+        }
+        $this->media = $media;
         $this->media->chdir(Templator::MY_TPL_DIR);
         // For users with only templator permission, we use sudo.
         App::auth()->sudo($this->media->getDir(...));
