@@ -14,6 +14,8 @@ _templator_ is a plugin for the open-source web publishing software called [Dotc
 You can copy existing templates, then edit them.
 You can attribute a template to a post or a category.
 
+A [user guide in French](https://github.com/JcDenis/templator/blob/master/docs/fr/utilisation.md) is available.
+
 ## REQUIREMENTS
 
 * Dotclear 2.39
@@ -33,6 +35,7 @@ Note: Remove all reference to __.html__ from about:config => system => media_exc
 
 ## LINKS
 
+* [User guide (in French)](https://github.com/JcDenis/templator/blob/master/docs/fr/utilisation.md)
 * [License](https://github.com/JcDenis/templator/blob/master/LICENSE)
 * [Packages & details](https://github.com/JcDenis/templator/releases) (or on [Repository](https://dotclear.org/plugin/detail/templator))
 * [Sources & contributions](https://github.com/JcDenis/templator)
