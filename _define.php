@@ -22,7 +22,7 @@ $this->registerModule(
     'Templates engine',
     'Create and select more templates for your posts',
     'Osku and contributors',
-    '1.10',
+    '1.11',
     [
         'requires'    => [
             ['core', '2.39'],

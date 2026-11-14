@@ -1,3 +1,15 @@
+templator 1.11 - 2026.11.14
+===========================================================
+* Fix DA URLs
+* Add Claude to contributors
+* Fix saving category templates
+* Fix entries template action
+* Fix category templates on SQLite
+* Fix templates list with blog media exclusion (Dotclear 2.39)
+* Fix texts and translations
+* Add a user guide in French, with screenshots
+* Add admin help for each page of the plugin
+
 templator 1.10 - 2026.11.05
 ===========================================================
 * Bump Dotclear from 2.36 to 2.39
