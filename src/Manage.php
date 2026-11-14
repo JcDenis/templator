@@ -749,7 +749,13 @@ class Manage
                 ->render();
         }
 
-        Page::helpBlock('templator');
+        Page::helpBlock(My::id() . '-' . match ($v->part) {
+            'new'    => 'new',
+            'edit'   => 'edit',
+            'used', 'posts' => 'used',
+            'files', 'copy', 'copycat', 'delete' => 'files',
+            default  => 'home',
+        });
 
         Page::closeModule();
     }
