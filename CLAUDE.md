@@ -29,7 +29,7 @@ Required Dotclear and PHP versions: see `_define.php`.
 * `src/Widgets.php`: widgets definition and rendering.
 * `js/`: `admin.js`, `posts.js`.
 * Widgets: `templatorWidget`.
-* Behaviors used: `adminPostHeaders`, `adminPostFormItems`, `adminPageHeaders`, `adminPageFormItems`, `adminAfterPostCreate`, `adminBeforePostUpdate`, `adminAfterPageCreate`, `adminBeforePageUpdate`, `adminPostsActions`, `adminPagesActions`, `adminFiltersListsV2`, `initWidgets`, `urlHandlerBeforeGetData`.
+* Behaviors used: `adminPostHeaders`, `adminPostFormItems`, `adminPageHeaders`, `adminPageFormItems`, `adminAfterPostCreate`, `adminBeforePostUpdate`, `adminAfterPageCreate`, `adminBeforePageUpdate`, `adminPostsActions`, `adminPagesActions`, `adminFiltersListsV3`, `initWidgets`, `urlHandlerBeforeGetData`.
 * Requires tags, themeEditor (`requires` in `_define.php`).
 
 ## Pitfalls
