@@ -25,7 +25,7 @@ $this->registerModule(
     '1.11',
     [
         'requires'    => [
-            ['core', '2.39'],
+            ['core', '2.40'],
             ['tags', '2.0'],
             ['themeEditor', '2.0'],
         ],

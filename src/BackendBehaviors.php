@@ -9,6 +9,7 @@ use Dotclear\App;
 use Dotclear\Core\Backend\Action\ActionsPosts;
 use Dotclear\Core\Backend\Notices;
 use Dotclear\Core\Backend\Page;
+use Dotclear\Core\Backend\UserPrefFilter;
 use Dotclear\Database\Cursor;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Helper\Html\Form\Div;
@@ -160,11 +161,12 @@ class BackendBehaviors
     }
 
     /**
-     * @param   ArrayObject<string, mixed>  $sorts
+     * @param   ArrayObject<array-key, UserPrefFilter>  $filters
      */
-    public static function adminFiltersListsV2(ArrayObject $sorts): void
+    public static function adminFiltersListsV3(ArrayObject $filters): void
     {
-        $sorts[My::id()] = [
+        $filters->append(new UserPrefFilter(
+            My::id(),
             __('Templates engine'),
             [
                 __('Date')     => 'post_upddt',
@@ -173,8 +175,9 @@ class BackendBehaviors
             ],
             'post_upddt',
             'desc',
-            [__('Templates per page'), 30],
-        ];
+            __('Templates per page'),
+            30
+        ));
     }
 
     /**

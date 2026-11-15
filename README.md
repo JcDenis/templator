@@ -18,7 +18,7 @@ A [user guide in French](https://github.com/JcDenis/templator/blob/master/docs/f
 
 ## REQUIREMENTS
 
-* Dotclear 2.39
+* Dotclear 2.40
 * PHP 8.1+
 * System writable directory on public path to store tempaltes
 * Dotclear content admin or templator 

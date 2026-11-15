@@ -46,7 +46,7 @@ class Backend
             'adminBeforePageUpdate' => BackendBehaviors::adminBeforePostUpdate(...),
             'adminPostsActions'     => BackendBehaviors::adminPostsActions(...),
             'adminPagesActions'     => BackendBehaviors::adminPostsActions(...),
-            'adminFiltersListsV2'   => BackendBehaviors::adminFiltersListsV2(...),
+            'adminFiltersListsV3'   => BackendBehaviors::adminFiltersListsV3(...),
             'initWidgets'           => Widgets::initWidgets(...),
         ]);
 
