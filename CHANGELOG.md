@@ -1,3 +1,8 @@
+templator 1.12 - 2026.11.22
+===========================================================
+* [compat] Use adminFiltersListsV3 behavior, require Dotclear 2.40
+* [compat] Use dotclear.toggleWithLegend() instead of deprecated jQuery plugin
+
 templator 1.11 - 2026.11.14
 ===========================================================
 * Fix saving category templates

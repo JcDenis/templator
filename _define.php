@@ -22,7 +22,7 @@ $this->registerModule(
     'Templates engine',
     'Create and select more templates for your posts',
     'Osku and contributors',
-    '1.11',
+    '1.12',
     [
         'requires'    => [
             ['core', '2.40'],
@@ -34,6 +34,6 @@ $this->registerModule(
         'support'     => 'https://github.com/JcDenis/' . $this->id . '/issues',
         'details'     => 'https://github.com/JcDenis/' . $this->id . '/',
         'repository'  => 'https://raw.githubusercontent.com/JcDenis/' . $this->id . '/master/dcstore.xml',
-        'date'        => '2026-11-14T16:20:48+00:00',
+        'date'        => '2026-11-22T14:10:42+00:00',
     ]
 );
